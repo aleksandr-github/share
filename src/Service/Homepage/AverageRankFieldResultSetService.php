@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Service\Homepage;
+
+use App\Helper\OddsHelper;
+use App\Helper\ProfitLossCalculationHelper;
+use App\Model\App\HorseDataModel;
+use App\Model\AverageRankFieldResultSet;
+use App\Service\DBConnector;
+use Symfony\Component\HttpFoundation\Request;
+
+class AverageRankFieldResultSetService
+{
+    /**
+     * @var DBConnector
+     */
+    protected $dbConnector;
+
+    public function __construct(DBConnector $dbConnector)
+    {
+        $this->dbConnector = $dbConnector;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param bool $oddsEnabled
+     * @return \App\Model\AverageRankFieldResultSet
+     */
+    public function generateAvgRankFieldResultSet(Request $request, bool $oddsEnabled, int $limit = null, int $offset = null): AverageRankFieldResultSet
+    {
+        $avgRankFieldResultSet = new AverageRankFieldResultSet();
+
+        $horseRatingData = $this->generateHorseRatingData($oddsEnabled);
+        $horseData = $this->generateHorseData($horseRatingData, $oddsEnabled);
+
+        $mode = $request->query->get('mode');
+        if ($mode == null || $mode == "null") {
+            $mode = 2;
+        }
+        $totalProfitAVR = 0;
+        if ($limit != null) {
+            $sql_raceid = "SELECT race_id  FROM tbl_races LIMIT " . $limit . ' OFFSET ' . $offset;
+        } else {
+            $sql_raceid = "SELECT race_id  FROM tbl_races";
+        }
+        $result_raceid = $this->dbConnector->getDbConnection()->query($sql_raceid);
+
+        $realResultsAVGArray = [];
+        if ($result_raceid->num_rows > 0)
+        {
+            // output data of each row
+            while ($row_id = $result_raceid->fetch_assoc())
+            {
+                $temp_array = array();
+                //$topIds = $this->generateTopIds($row_id['race_id']);
+
+                /** @var HorseDataModel $horseDatum */
+                foreach ($horseData as $horseDatum) {
+                    if ($row_id['race_id'] == $horseDatum->getRaceId()) {
+                        $temp_array[] = $horseDatum;
+                    }
+                }
+
+                usort($temp_array, function (HorseDataModel $a, HorseDataModel $b) {
+                    return strcmp($a->getRank(), $b->getRank()) * -1;
+                });
+
+                if (count($temp_array) > 0) {
+                    try {
+                        switch ($mode) {
+                            case 1:
+                                $real_result = array(
+                                    $temp_array[0]
+                                );
+                                break;
+                            case 3:
+                                $real_result = array(
+                                    $temp_array[0],
+                                    $temp_array[1],
+                                    $temp_array[2]
+                                );
+                                break;
+                            case 2:
+                            default:
+                                $real_result = array(
+                                    $temp_array[0],
+                                    $temp_array[1]
+                                );
+                                break;
+                        }
+
+                        $race = $this->dbConnector->getRaceDetails($row_id['race_id']);
+                        $meeting = $this->dbConnector->getMeetingDetails($race->getMeetingId());
+                        if (count($real_result) > 0) {
+                            /** @var HorseDataModel $horseDataModel */
+                            foreach ($real_result as $horseDataModel) {
+                                $avgRank = number_format($horseDataModel->getRank(true), 2);
+                                //$profit = in_array($horseDataModel->getHorseId(), $topIds) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
+                                $profit = ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
+                                $totalProfitAVR += $profit;
+                                $avgRankFieldResultSet->calculateAbsoluteTotal($profit);
+
+                                $realResultsAVGArray[] = [
+                                    'raceId' => $horseDataModel->getRaceId(),
+                                    'horseId' => $horseDataModel->getHorseId(),
+                                    'horse' => $horseDataModel->getHorseName(),
+                                    'race' => $race,
+                                    'meeting' => $meeting,
+                                    'rating' => number_format($horseDataModel->getRating(true), 2),
+                                    'avgRank' => $avgRank,
+                                    'revenue' => $profit,
+                                    'total' => $totalProfitAVR
+                                ];
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        // todo it fails
+                    }
+                }
+            }
+        }
+        $avgRankFieldResultSet->setResults($realResultsAVGArray);
+
+        return $avgRankFieldResultSet;
+    }
+
+    private function generateHorseRatingData(bool $oddsEnabled): array
+    {
+        $horseRatingData = [];
+
+        $testSql = "SELECT hr.horse_position, hr.horse_id, race_id, AVG(rating) as rating, (SUM(hr.rank)/COUNT(hr.race_id)) AS ranks, horse_fixed_odds FROM tbl_hist_results hr INNER JOIN tbl_horses h ON hr.horse_id = h.horse_id WHERE 1 GROUP BY horse_name, horse_fixed_odds";
+        $result = $this->dbConnector->getDbConnection()->query($testSql);
+        if ($result->num_rows > 0) {
+            while ($horseData = $result->fetch_object()) {
+                if (OddsHelper::oddsFilter($horseData->horse_fixed_odds, $oddsEnabled)) {
+                    $horseRatingData[$horseData->horse_id][$horseData->race_id] = [
+                        'rating' => $horseData->rating,
+                        'rank' => $horseData->ranks,
+                        'horse_fixed_odds' => $horseData->horse_fixed_odds,
+                        'position' => $horseData->horse_position
+                    ];
+                }
+            }
+        }
+
+        return $horseRatingData;
+    }
+
+    private function generateHorseData(array $horseRatingData, bool $oddsEnabled): array
+    {
+        $horseData = [];
+        $sql = "SELECT horse_name,hr.horse_id,hr.race_id,hr.horse_position,hr.hist_id, AVG(rating) AS rating, (SUM(hr.rank)/COUNT(hr.race_id)) AS ranks, horse_fixed_odds 
+FROM tbl_hist_results hr INNER JOIN tbl_horses h ON hr.horse_id = h.horse_id WHERE 1 GROUP BY hr.horse_id, horse_fixed_odds ";
+        $result = $this->dbConnector->getDbConnection()->query($sql);
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                if (OddsHelper::oddsFilter($row['horse_fixed_odds'], $oddsEnabled)) {
+                    $horseData[] = new HorseDataModel(
+                        $row['race_id'],
+                        $row['horse_id'],
+                        $row['horse_name'],
+                        $horseRatingData[$row['horse_id']][$row['race_id']]['rating'],
+                        $horseRatingData[$row['horse_id']][$row['race_id']]['rank'],
+                        $horseRatingData[$row['horse_id']][$row['race_id']]['position'],
+                        $horseRatingData[$row['horse_id']][$row['race_id']]['horse_fixed_odds'],
+                        $row['hist_id']
+                    );
+                }
+            }
+        }
+
+        return $horseData;
+    }
+
+    private function generateTopIds(int $raceId): array
+    {
+        // top ids?!
+        $temp = [];
+        $sqlQuery = $this->dbConnector->getDbConnection()->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$raceId'");
+        while($tempRacesHorse = $sqlQuery->fetch_object()) {
+            $sqlfavg2 = "SELECT *, AVG(rating) rat,AVG(rank) as avgrank FROM `tbl_hist_results` WHERE `race_id`='".$raceId."' AND `horse_id`='$tempRacesHorse->horse_id' GROUP BY horse_id";
+            $sqlavg2 = $this->dbConnector->getDbConnection()->query($sqlfavg2);
+
+            while($resavg2 = $sqlavg2->fetch_assoc()) {
+                $temp[] = $resavg2;
+            }
+
+        }
+        usort($temp, function($a, $b)
+        {
+            return ($a["avgrank"] <= $b["avgrank"]) ? -1 : 1;
+        });
+        $temp = array_reverse($temp);
+        $table = array_slice($temp, 0, 0);
+        $top_ids = [];
+        foreach ($table as $arr){
+            $top_ids[] = $arr['horse_id'];
+        }
+
+        return $top_ids;
+    }
+}
