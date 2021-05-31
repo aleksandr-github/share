@@ -1,0 +1,53 @@
+<ul>
+    <li><a href="{{ path('index') }}">Home</a></li>
+    <li>
+        <a href="{{ path('horse_index') }}" {% if app.request.attributes.get('_route') == 'horse_index' %}class='active'{% endif %}>
+            Horses
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('meeting_index') }}" {% if app.request.attributes.get('_route') == 'meeting_index' %}class='active'{% endif %}>
+            Meetings
+        </a>
+    </li>
+
+    {% if app.session.get('meeting_id') is not empty %}
+        <li><a href="{{ path('races_index', { 'meeting': app.session.get('meeting_id') }) }}">Races</a></li>
+        <li><a class="active">{{ app.session.get('meeting_name') }}</a></li>
+
+        {% if races is defined %}
+            {% for race in races %}
+                <li>
+                    {% if raceId is defined %}
+                        <a href="{{ path('races_details', { 'meeting': app.session.get('meeting_id'), 'race': race.race_id, 'average': "average"}) }}"
+                           {% if race.race_id == raceId %}class="active"{% endif %}>
+                            {{ race.race_order }}
+                        </a>
+                    {% else %}
+                        <a href="{{ path('races_details', { 'meeting': app.session.get('meeting_id'), 'race': race.race_id, 'average': "average"}) }}">
+                            {{ race.race_order }}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% endif %}
+
+        {% if app.request.attributes.get('_route') == 'races_details' %}
+            {% if app.request.attributes.get('average') == "average" %}
+                <li class="pull-right">
+                    <a href="{{ path('horse_index') }}" class="dropdown-item active">Show Horses</a>
+                </li>
+                <li class="pull-right">
+                    <a href="{{ path('races_details', {'race': raceId, 'meeting': app.session.get('meeting_id'), 'average': "default"}) }}" class="dropdown-item active">Show All</a>
+                </li>
+            {% else %}
+                <li class="pull-right">
+                    <a href="{{ path('horse_index') }}" class="dropdown-item active">Show Horses</a>
+                </li>
+                <li class="pull-right">
+                    <a href="{{ path('races_details', {'race': raceId, 'meeting': app.session.get('meeting_id'), 'average': "average"}) }}?avg=1" class="dropdown-item active">Show Average</a>
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</ul>
