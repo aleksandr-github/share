@@ -1,0 +1,10 @@
+[10-Apr-2021 18:33:59 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:34:06 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:34:09 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:34:17 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:34:49 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:34:53 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:35:39 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:35:44 UTC] PHP Parse error:  syntax error, unexpected '=>' (T_DOUBLE_ARROW), expecting ')' in /var/www/horse/public_html/.env.local.php on line 15
+[10-Apr-2021 18:36:44 UTC] PHP Parse error:  syntax error, unexpected ''Threshold'' (T_CONSTANT_ENCAPSED_STRING), expecting ')' in /var/www/horse/public_html/.env.local.php on line 16
+[10-Apr-2021 18:36:47 UTC] PHP Parse error:  syntax error, unexpected ''Threshold'' (T_CONSTANT_ENCAPSED_STRING), expecting ')' in /var/www/horse/public_html/.env.local.php on line 16

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'partial/nav.html.twig' %}
+    <div class="container">
+        <div class="panel-group">
+            <div class="panel panel-primary">
+                <div class="panel-heading">{{ horseDetails.horseName }} #{{ horseDetails.horseId}}</div>
+                <div class="panel-body">
+
+                    <table id="employee_grid_2" class="display" width="100%" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td>Horse Name: {{ horseDetails.horseName }}</td>
+                                <td>Horse Slug: {{ horseDetails.horseSlug }}></td>
+                                <td>Horse Latest Results: {{ horseDetails.horseLatestResults }}</td>
+                                <td>Added On: {{ horseDetails.horseAddedOn }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="">
+            <h1>Meetings Data</h1>
+            <div class="">
+                <table id="employee_grid" class="display" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Meeting Date</th>
+                        <th>Meeting Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for meeting in horseDetails.meetings %}
+                        <tr>
+                            <td>{{ meeting.meetingDate }}</td>
+                            <td>
+                                <a href="{{ path('races_index', {'meeting': meeting.meetingId}) }}">{{ meeting.meetingName }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Meeting Date</th>
+                        <th>Meeting Name</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#employee_grid').DataTable({
+                "responsive": true,
+            });
+        });
+    </script>
+{% endblock %}
+
