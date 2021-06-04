@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'partial/nav_parser.html.twig' %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h1>Scrapping for `data`, `meetings`, `races`, `horses` tables</h1>
+
+                <form method="post" id="scrapper-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="start_date">Select start date</label>
+                                <input type="text" name="start_date" class="form-control datepicker" id="start_date"
+                                       placeholder="Select start date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="end_date">Select end date</label>
+                                <input type="text" name="end_date" class="form-control datepicker" id="end_date"
+                                       placeholder="Select rnd date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="scrape" disabled>Scrape</button>
+                </form>
+
+                <div class="alert alert-danger" role="alert" id="scraper-warning" style="margin-top: 20px">
+                    <p>
+                        Due to pthreads developer's controversial decision <a href="https://serverfault.com/questions/748001/the-apache2handler-sapi-is-not-supported-by-pthreads" alt="source">(source)</a>,
+                        which results in complete abandoning pthreads support for Apache2handler SAPI,
+                        scraper in current version cannot be launched from UI/UX.
+                    </p>
+                    <p>
+                        Please run scraper from command line:
+                    </p>
+                    <p>
+                        <code>
+                            $ cd __PROJECT_DIR__ && php bin/console run:scraper {startDate} {?endDate}
+                        </code>
+                    </p>
+                    <p>Example:</p>
+                    <p>
+                        <code>
+                            $ cd . && php bin\console run:scraper 2021-03-03
+                        </code>
+                    </p>
+                </div>
+
+                {#<div class="alert alert-info" role="alert" id="scraper-running">
+                    Scraper initializing.
+                </div>#}
+
+                <div class="row"
+                     style="margin-top: 20px; background-color: #2b2b2b; color: #999999; font-family: 'Lucida Console', sans-serif; height: 500px; width: auto; font-size: 11px;">
+                    <div class="results"></div>
+                    <div class="lds-dual-ring"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(function () {
+            $(".datepicker").datepicker({
+                maxDate: '0',
+                dateFormat: 'yy-mm-dd',
+                onSelect: function (dateText) { // this.value
+                    if ('start_date' == $(this).attr('id')) {
+                        $("#end_date").datepicker("option", "minDate", dateText);
+                    }
+                    if ('end_date' == $(this).attr('id')) {
+                        $("#start_date").datepicker("option", "maxDate", dateText);
+                    }
+                }
+            }).datepicker("setDate", new Date());
+            var lastData;
+            var counter = 0;
+            var interval = 1000;  // 1000 = 1 second, 3000 = 3 seconds
+            function doAjax() {
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('log_main') }}",
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (lastData === data) {
+                            counter++;
+                            if (counter > 4) {
+                                $('.lds-dual-ring').hide();
+                            }
+                        } else {
+                            if (lastData != null) {
+                                $('.lds-dual-ring').show();
+                                counter = 0;
+                            }
+                        }
+                        $('.results').text("").append(data);// first set the value
+                        lastData = data;
+                    },
+                    complete: function (data) {
+                        // Schedule the next
+                        setTimeout(doAjax, interval);
+                    }
+                });
+            }
+
+            setTimeout(doAjax, interval);
+        });
+    </script>
+{% endblock %}
+

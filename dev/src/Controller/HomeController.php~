@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Controller;
+
+use App\Model\AverageRankFieldResultSet;
+use App\Service\Homepage\AverageRankFieldResultSetService;
+use App\Service\Homepage\RatingFieldResultSetService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+
+class HomeController extends AbstractController
+{
+
+    /**
+     * @var AverageRankFieldResultSetService
+     */
+    protected $averageRankFieldResultSetService;
+
+    /**
+     * @var RatingFieldResultSetService
+     */
+    protected $ratingFieldResultSetService;
+
+    public function __construct(
+        AverageRankFieldResultSetService $averageRankFieldResultSetService,
+        RatingFieldResultSetService $ratingFieldResultSetService
+    ) {
+        $this->averageRankFieldResultSetService = $averageRankFieldResultSetService;
+        $this->ratingFieldResultSetService = $ratingFieldResultSetService;
+    }
+
+    /**
+     * @Route("/", name="index")
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function show(Request $request, CacheInterface $cache): Response
+    {
+        $oddsFilter = $request->get('odds');
+        if ($oddsFilter === null) {
+            $oddsFilter = false;
+        }
+
+        if ($useCache = false) {
+            $avgRankFieldResultSet = $cache->get('home.show.avgrank.results', function(ItemInterface $item) use ($request, $oddsFilter)
+            {
+                $item->expiresAfter(60);
+                return $this->averageRankFieldResultSetService->generateAvgRankFieldResultSet($request, $oddsFilter);
+            });
+
+            $ratingFieldResultSet = $cache->get('home.show.rating.results', function(ItemInterface $item) use ($request, $oddsFilter)
+            {
+                $item->expiresAfter(60);
+                return $this->ratingFieldResultSetService->generateRatingFieldResultSet($request, $oddsFilter);
+            });
+        } else {
+            $avgRankFieldResultSet = $this->averageRankFieldResultSetService->generateAvgRankFieldResultSet($request, $oddsFilter);
+            $ratingFieldResultSet = $this->ratingFieldResultSetService->generateRatingFieldResultSet($request, $oddsFilter);
+        }
+
+        return $this->render('home.html.twig', [
+            'avgRankFieldResultSet' => $avgRankFieldResultSet,
+            'ratingFieldResultSet' => $ratingFieldResultSet,
+            'requestMode' => $request->query->get('mode')
+        ]);
+    }
+}

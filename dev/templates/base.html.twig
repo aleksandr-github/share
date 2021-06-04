@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %} | {{ appVersion() }}</title>
+        <link rel="shortcut icon" href="/favicon.ico?f={{ appVersion() }}" type="image/x-icon">
+        <link rel="icon" href="/favicon.ico?f={{ appVersion() }}" type="image/x-icon">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <link rel="stylesheet" href="/assets/jquery-ui/jquery-ui.min.css">
+        <script src="/assets/jquery.min.js"></script>
+
+        <link rel="stylesheet" href="/assets/jquery-ui/jquery-ui-add.min.css">
+        <script src="/assets/jquery-1.12.4.min.js"></script>
+        <script src="/assets/jquery-ui/jquery-ui.min.js"></script>
+
+        <link rel="stylesheet" id="main-css" href="/assets/main.css" type="text/css" media="all">
+
+        <!-- Datatables -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"/>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+        <!-- Responsiveness of DataTables -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.7/css/responsive.dataTables.min.css">
+        <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/responsive/2.2.7/js/dataTables.responsive.min.js"></script>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+        <style>
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+            .container-fluid {
+                margin-right: auto;
+                margin-left: auto;
+                max-width: 1600px; /* or 950px */
+            }
+
+            .lds-dual-ring {
+                display: inline-block;
+                width: 80px;
+                height: 80px;
+                position: absolute;
+                bottom: 0;
+                right: 0;
+            }
+
+            .lds-dual-ring:after {
+                content: " ";
+                display: block;
+                width: 64px;
+                height: 64px;
+                margin: 8px;
+                border-radius: 50%;
+                border: 6px solid #fff;
+                border-color: #fff transparent #fff transparent;
+                animation: lds-dual-ring 1.2s linear infinite;
+            }
+
+            @keyframes lds-dual-ring {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .margin-top {
+                margin-top: 35px;
+            }
+
+            .separator::after {
+                content: "::";
+            }
+
+            /* mouse over link */
+            a:hover {
+                color: #bbbbbb !important;
+                text-decoration: none !important;
+            }
+
+            a:link {
+                text-decoration: none !important;
+            }
+
+            a:visited {
+                text-decoration: none !important;
+            }
+
+            a:active {
+                text-decoration: none !important;
+            }
+        </style>
+        <!-- .jquery -->
+        <!-- bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+              crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.7/css/responsive.bootstrap.min.css"/>
+        {% block stylesheets %}
+        {% endblock %}
+
+        <script>
+            $(function () {
+                $('.tooltip-link').tooltip({
+                    content: function () {
+                        return $(this).prop('title');
+                    },
+                    show: null,
+                    close: function (event, ui) {
+                        ui.tooltip.hover(
+
+                            function () {
+                                $(this).stop(true).fadeTo(400, 1);
+                            },
+
+                            function () {
+                                $(this).fadeOut("400", function () {
+                                    $(this).remove();
+                                })
+                            });
+                    }
+                });
+            });
+        </script>
+        {% block javascripts %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+
+        <div class="clearfix"></div>
+        {% block footer %}
+            {% include 'partial/footer.html.twig' %}
+        {% endblock %}
+    </body>
+</html>

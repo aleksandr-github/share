@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Races View
+{% endblock %}
+
+{% block body %}
+    {% include 'partial/nav.html.twig' %}
+
+    <div class="container-fluid">
+        <div class="">
+            <h1>Race Data</h1>
+            <div class="">
+                <table id="races-grid" class="display" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Race</th>
+                        <th>Race No.</th>
+                        <th>Race Schedule</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for race in races %}
+                        <tr>
+                            <td>{{ race.race_order }}</td>
+                            <td><a href="{{ path('races_details', { 'race': race.race_id, 'meeting': meetingId, 'average': "average" }) }}">{{ race.race_title }}</a></td>
+                            <td>{{ meetingDetails.meetingDate }} {{ race.race_schedule_time }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Race</th>
+                        <th>Race No.</th>
+                        <th>Race Schedule</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#races-grid').DataTable({
+                "responsive": true,
+            });
+        });
+    </script>
+{% endblock %}
