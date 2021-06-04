@@ -1,8 +1,0 @@
-<ul>
-    <li>
-        <a href="{{ path('parser_main') }}" {% if app.request.attributes.get('_route') == 'parser_main' %}class='active'{% endif %}>Scraper</a>
-    </li>
-    <li>
-        <a href="{{ path('parser_results') }}" {% if app.request.attributes.get('_route') == 'parser_results' %}class='active'{% endif %}>Parse results</a>
-    </li>
-</ul>
