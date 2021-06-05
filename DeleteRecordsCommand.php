@@ -116,16 +116,14 @@ class DeleteRecordsCommand extends Command
             $count = substr_count($answer, '-');
             if($count >= 2){
                 $datesArray = explode(">", $answer);
-                $timestamp0 = strtotime($datesArray[0]);
+                $timestamp0 = $datesArray[0];
 
-                if(!isset($datesArray[1]))
-                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
-                $timestamp1 = strtotime($datesArray[1]);
+                if(count($datesArray)==1)
+                    $timestamp1 = '';
+                else
+                    $timestamp1 = $datesArray[1];
 
-                if($timestamp0 >= $timestamp1) {
-                    throw new \LogicException("Range must valid.");
-                }
-                return  "WHERE `meeting_date` BETWEEN '".$datesArray[0]."' AND '".$datesArray[1]."'";
+                return  "WHERE `meeting_date` IN ('".$timestamp0."','".$timestamp1."')";
             }
             else{
                 $idsArray = explode("-", $answer);
