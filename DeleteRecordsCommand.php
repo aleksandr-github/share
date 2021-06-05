@@ -7,7 +7,6 @@ use App\Service\App\MeetingService;
 use App\Service\App\RaceService;
 use App\Service\App\TempHorseRacesService;
 use App\Service\DBConnector;
-use App\Model\DateRange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -49,21 +48,14 @@ class DeleteRecordsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getArgument('purgeDateQuery')) {
-            $io->success("Parser finished. Check main_log.txt for details.");
             $meetings = $this->generateMeetingsTable($io);
             $io->text("Supported operands: = > >= < <= -");
             $question = new Question("Delete query: (examples: <3 (delete meetings with ID lower than 3), >40 (delete meetings with ID higher than 40), 30 (delete meeting with ID 30), 10-40 (delete meeting with ID's in range of 10 to 40))");
             $answer = $io->askQuestion($question);
-            $partialSQL = $this->getPartialMeetingSQLForAnswer($answer);
         } else {
-            $io->success("purgeDateQuery finished. Check main_log.txt for details.");
             $answer = $input->getArgument('purgeDateQuery');
-            if (empty($input->getArgument('endDate'))) {
-                $input->setArgument('endDate', $input->getArgument('startDate'));
-            }
-            $dateRange = DateRangeBuilder::create($input->getArgument('startDate'), $input->getArgument('endDate'));
-            $partialSQL = $this->getPartialMeetingDateSQLForAnswer($dateRange);
         }
+        $partialSQL = $this->getPartialMeetingSQLForAnswer($answer);
         $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
 
         $io->warning("You're about to delete " . count($partialMeetings) . " meeting(s), along with races, records and historic data from DB.");
@@ -121,11 +113,27 @@ class DeleteRecordsCommand extends Command
     private function getPartialMeetingSQLForAnswer(string $answer): string
     {
         if (strpos($answer, '-') > 0) {
-            $idsArray = explode("-", $answer);
-            if ($idsArray[0] >= $idsArray[1]) {
-                throw new \LogicException("Range must valid.");
+            $count = substr_count($answer, '-');
+            if($count >= 2){
+                $datesArray = explode(">", $answer);
+                $timestamp0 = $datesArray[0];
+
+                if(!isset($datesArray[1]))
+                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
+                $timestamp1 = strtotime($datesArray[1]);
+
+                if($timestamp0 >= $timestamp1) {
+                    throw new \LogicException("Range must valid.");
+                }
+                return  "WHERE `meeting_date` BETWEEN '".$datesArray[0]."' AND '".$datesArray[1]."'";
             }
-            return "WHERE `race_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
+            else{
+                $idsArray = explode("-", $answer);
+                if ($idsArray[0] >= $idsArray[1]) {
+                    throw new \LogicException("Range must valid.");
+                }
+                return "WHERE `meeting_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
+            }
         } else {
             $sign = $answer[0];
             switch ($sign) {
@@ -145,11 +153,5 @@ class DeleteRecordsCommand extends Command
                     throw new \Exception('Unknown operand used.');
             }
         }
-    }
-
-    private function getPartialMeetingDateSQLForAnswer(DateRange $dateRange): string
-    {
-        return "WHERE meeting_date IN (".$dateRange->toSQLQuery().")";
-
     }
 }
