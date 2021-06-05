@@ -117,10 +117,11 @@ class DeleteRecordsCommand extends Command
             if($count >= 2){
                 $datesArray = explode(" ", $answer);
                 $timestamp0 = strtotime($datesArray[0]);
+
+                if($datesArray[1] == '')
+                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
                 $timestamp1 = strtotime($datesArray[1]);
 
-                if($timestamp1 == '')
-                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
                 if($timestamp0 >= $timestamp1) {
                     throw new \LogicException("Range must valid.");
                 }
