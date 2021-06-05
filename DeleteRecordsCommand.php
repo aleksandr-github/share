@@ -49,13 +49,15 @@ class DeleteRecordsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getArgument('purgeDateQuery')) {
+            $io->success("Parser finished. Check main_log.txt for details.");
             $meetings = $this->generateMeetingsTable($io);
             $io->text("Supported operands: = > >= < <= -");
             $question = new Question("Delete query: (examples: <3 (delete meetings with ID lower than 3), >40 (delete meetings with ID higher than 40), 30 (delete meeting with ID 30), 10-40 (delete meeting with ID's in range of 10 to 40))");
             $answer = $io->askQuestion($question);
             $partialSQL = $this->getPartialMeetingSQLForAnswer($answer);
         } else {
-//            $answer = $input->getArgument('purgeDateQuery');
+            $io->success("purgeDateQuery finished. Check main_log.txt for details.");
+            $answer = $input->getArgument('purgeDateQuery');
             if (empty($input->getArgument('endDate'))) {
                 $input->setArgument('endDate', $input->getArgument('startDate'));
             }
@@ -119,25 +121,11 @@ class DeleteRecordsCommand extends Command
     private function getPartialMeetingSQLForAnswer(string $answer): string
     {
         if (strpos($answer, '-') > 0) {
-            $count = substr_count($answer, '-');
-            if($count >= 2){
-                $datesArray = explode(">", $answer);
-                $timestamp0 = $datesArray[0];
-
-                if(count($datesArray)==1)
-                    $timestamp1 = '';
-                else
-                    $timestamp1 = $datesArray[1];
-
-                : string
+            $idsArray = explode("-", $answer);
+            if ($idsArray[0] >= $idsArray[1]) {
+                throw new \LogicException("Range must valid.");
             }
-            else{
-                $idsArray = explode("-", $answer);
-                if ($idsArray[0] >= $idsArray[1]) {
-                    throw new \LogicException("Range must valid.");
-                }
-                return "WHERE `meeting_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
-            }
+            return "WHERE `race_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
         } else {
             $sign = $answer[0];
             switch ($sign) {
