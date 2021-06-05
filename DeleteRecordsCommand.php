@@ -125,7 +125,7 @@ class DeleteRecordsCommand extends Command
                 if($timestamp0 >= $timestamp1) {
                     throw new \LogicException("Range must valid.");
                 }
-                return  "WHERE `meeting_date` BETWEEN ".$datesArray[0]." AND ".$datesArray[1];
+                return  "WHERE `meeting_date` BETWEEN '".$datesArray[0]."' AND '".$datesArray[1]."'";
             }
             else{
                 $idsArray = explode("-", $answer);
