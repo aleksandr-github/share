@@ -48,16 +48,18 @@ class DeleteRecordsWithDateCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (empty($input->getArgument('endDate'))) {
-            $input->setArgument('endDate', $input->getArgument('startDate'));
-        }
-
-        $dateRange = DateRangeBuilder::create($input->getArgument('startDate'), $input->getArgument('endDate'));
-
-        $partialSQL = $this->getPartialMeetingSQLForAnswer($dateRange);
-        $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
-
-        $io->warning("You're about to delete " . $partialMeetings . " meeting(s), along with races, records and historic data from DB.");
+//        $io->text("Started parsing, please wait. You can check logs/main_log.txt to see progress in real time.");
+//
+//        if (empty($input->getArgument('endDate'))) {
+//            $input->setArgument('endDate', $input->getArgument('startDate'));
+//        }
+//
+//        $dateRange = DateRangeBuilder::create($input->getArgument('startDate'), $input->getArgument('endDate'));
+//
+//        $partialSQL = $this->getPartialMeetingSQLForAnswer($dateRange);
+//        $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
+//
+//        $io->warning("You're about to delete " . $partialMeetings . " meeting(s), along with races, records and historic data from DB.");
 //        $proceed = $io->confirm("Are you sure you want to proceed?");
 //        if ($proceed) {
 //            foreach ($partialMeetings as $meeting) {
