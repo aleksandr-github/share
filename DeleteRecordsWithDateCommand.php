@@ -141,12 +141,4 @@ class DeleteRecordsWithDateCommand extends Command
         return $meetings;
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function getPartialMeetingSQLForAnswer(DateRange $dateRange): string
-    {
-        $query = "WHERE meeting_date IN (".$dateRange->toSQLQuery().")";
-        return $query;
-    }
 }
