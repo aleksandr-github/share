@@ -39,6 +39,14 @@ class DeleteRecordsWithDateCommand extends Command
         $this->setDescription('Purge is a function that is sometimes necessary to use to update a DB to clean up records.')
             ->setHelp('Use at your own will.')
             ->addArgument('purgeDateQuery', InputArgument::OPTIONAL, 'Query for purge dates');
+
+        $this
+            ->setName('purgeDateQuery')
+            ->setDescription('Greet purgeDateQuery')
+            ->addArgument('startDate', InputArgument::OPTIONAL, 'What is Start Date?')
+            ->addArgument('endDate', InputArgument::OPTIONAL, 'What is End Date?')
+            ->addOption('yell', null, InputOption::VALUE_NONE, 'If set, the task will yell in uppercase letters')
+        ;
     }
 
     /**
@@ -46,48 +54,20 @@ class DeleteRecordsWithDateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $startDate = $input->getArgument('startDate');
+        $endDate = $input->getArgument('endDate');
+        if ($endDate) {
+            $text = 'endDate '.$endDate;
+        }
+        if ($startDate) {
+            $text = 'startDate '.$startDate;
+        }
 
-//        $io->text("Started parsing, please wait. You can check logs/main_log.txt to see progress in real time.");
-//
-//        if (empty($input->getArgument('endDate'))) {
-//            $input->setArgument('endDate', $input->getArgument('startDate'));
-//        }
-//
-//        $dateRange = DateRangeBuilder::create($input->getArgument('startDate'), $input->getArgument('endDate'));
-//
-//        $partialSQL = $this->getPartialMeetingSQLForAnswer($dateRange);
-//        $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
-//
-//        $io->warning("You're about to delete " . $partialMeetings . " meeting(s), along with races, records and historic data from DB.");
-//        $proceed = $io->confirm("Are you sure you want to proceed?");
-//        if ($proceed) {
-//            foreach ($partialMeetings as $meeting) {
-//                $io->text("Deleting meeting " . $meeting->getMeetingName() . ", please wait.");
-//                $races = $this->raceService->getRacesWithPartialWhere("WHERE meeting_id = " . $meeting->getMeetingId(), true);
-//
-//                // delete races
-//                $progress = new ProgressBar($io);
-//                ProgressBar::setFormatDefinition('races_format', 'Deleting race of ID: %message%');
-//                $progress->setFormat('races_format');
-//                $progress->setMaxSteps(count($races));
-//                foreach ($races as $race) {
-//                    // historic results for race
-//                    $progress->setMessage($race->getRaceId());
-//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_hist_results` WHERE `race_id` = " . $race->getRaceId());
-//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_temp_hraces` WHERE `race_id` = " . $race->getRaceId());
-//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_results` WHERE `race_id` = " . $race->getRaceId());
-//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_races` WHERE `race_id` = " . $race->getRaceId());
-//
-//                    $progress->advance();
-//                }
-//                $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_meetings` WHERE `meeting_id` = " . $meeting->getMeetingId());
-//                $progress->finish();
-//            }
-//            $io->success("Meetings with it's corresponding data has been deleted.");
-//        }
+        if ($input->getOption('yell')) {
+            $text = strtoupper($text)."ok";
+        }
 
-        return Command::SUCCESS;
+        $output->writeln($text);
     }
 
     /**
