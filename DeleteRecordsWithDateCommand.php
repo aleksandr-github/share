@@ -37,16 +37,12 @@ class DeleteRecordsWithDateCommand extends Command
 
     protected function configure()
     {
-        $this->setDescription('Purge is a function that is sometimes necessary to use to update a DB to clean up records.')
-            ->setHelp('Use at your own will.')
-            ->addArgument('purgeDateQuery', InputArgument::OPTIONAL, 'Query for purge dates');
-
         $this
             ->setName('purgeDateQuery')
             ->setDescription('Greet purgeDateQuery')
             ->addArgument('startDate', InputArgument::OPTIONAL, 'What is Start Date?')
             ->addArgument('endDate', InputArgument::OPTIONAL, 'What is End Date?')
-            ->addOption('yell', null, InputOption::VALUE_NONE, 'If set, the task will yell in uppercase letters')
+            ->addOption('dateOption', null, InputOption::VALUE_NONE, 'If set, the task will yell in uppercase letters')
         ;
     }
 
@@ -57,22 +53,38 @@ class DeleteRecordsWithDateCommand extends Command
     {
         $startDate = $input->getArgument('startDate');
         $endDate = $input->getArgument('endDate');
-        $text1 = "";
-        $text2 = "";
-        if ($endDate) {
-            $text2 = 'endDate '.$endDate;
+
+        if ((!$startDate)||(!$this->check_date($startDate))) {
+            throw new \LogicException("Range must valid.");
         }
-        if ($startDate) {
-            $text1 = 'startDate '.$startDate;
+        else{
+            $startTimeStamp = strtotime($startDate);
         }
 
-//        if ($input->getOption('yell')) {
+        if (!$endDate) {
+            $endDate = $startDate;
+        }
+        if (!$this->check_date($endDate)) {
+            throw new \LogicException("Range must valid.");
+        }
+        $endTimeStamp = strtotime($endDate);
+
+        if($startTimeStamp > $endTimeStamp) {
+            throw new \LogicException("Range must valid.");
+        }
+
+//        if ($input->getOption('dateOption')) {
 //            $text = strtoupper($text)."ok";
 //        }
 
-        $output->writeln($text1);
-        $output->writeln($text2);
+        $output->writeln($startDate.' '.$endDate);
+
         return Command::SUCCESS;
+    }
+
+    protected function check_date($x): bool
+    {
+        return (date('Y-m-d', strtotime($x)) == $x);
     }
 
     /**
