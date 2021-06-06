@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DeleteRecordsCommand extends Command
+class DeleteRecordsWithDateCommand extends Command
 {
     protected static $defaultName = 'run:purgeDateQuery';
     protected $raceService;
@@ -48,15 +48,13 @@ class DeleteRecordsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getArgument('purgeDateQuery')) {
-            $meetings = $this->generateMeetingsTable($io);
-            $io->text("Supported operands: = > >= < <= -");
-            $question = new Question("Delete query: (examples: <3 (delete meetings with ID lower than 3), >40 (delete meetings with ID higher than 40), 30 (delete meeting with ID 30), 10-40 (delete meeting with ID's in range of 10 to 40))");
-            $answer = $io->askQuestion($question);
-        } else {
-            $answer = $input->getArgument('purgeDateQuery');
+        if (empty($input->getArgument('endDate'))) {
+            $input->setArgument('endDate', $input->getArgument('startDate'));
         }
-        $partialSQL = $this->getPartialMeetingSQLForAnswer($answer);
+
+        $dateRange = DateRangeBuilder::create($input->getArgument('startDate'), $input->getArgument('endDate'));
+
+        $partialSQL = $this->getPartialMeetingSQLForAnswer($dateRange);
         $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
 
         $io->warning("You're about to delete " . count($partialMeetings) . " meeting(s), along with races, records and historic data from DB.");
@@ -111,48 +109,9 @@ class DeleteRecordsCommand extends Command
     /**
      * @throws \Exception
      */
-    private function getPartialMeetingSQLForAnswer(string $answer): string
+    private function getPartialMeetingSQLForAnswer(DateRange $dateRange): string
     {
-        if (strpos($answer, '-') > 0) {
-            $count = substr_count($answer, '-');
-            if($count >= 2){
-                $datesArray = explode(">", $answer);
-                $timestamp0 = $datesArray[0];
-
-                if(!isset($datesArray[1]))
-                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
-                $timestamp1 = strtotime($datesArray[1]);
-
-                if($timestamp0 >= $timestamp1) {
-                    throw new \LogicException("Range must valid.");
-                }
-                return  "WHERE `meeting_date` BETWEEN '".$datesArray[0]."' AND '".$datesArray[1]."'";
-            }
-            else{
-                $idsArray = explode("-", $answer);
-                if ($idsArray[0] >= $idsArray[1]) {
-                    throw new \LogicException("Range must valid.");
-                }
-                return "WHERE `meeting_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
-            }
-        } else {
-            $sign = $answer[0];
-            switch ($sign) {
-                case is_numeric($sign):
-                    return "WHERE `meeting_id`=" . $sign;
-                case "=":
-                    return "WHERE `meeting_id`=" . str_replace("=", "", $answer);
-                case "<":
-                    return "WHERE `meeting_id`<" . str_replace("<", "", $answer);
-                case "<=":
-                    return "WHERE `meeting_id`<=" . str_replace("<=", "", $answer);
-                case ">":
-                    return "WHERE `meeting_id`>" . str_replace(">", "", $answer);
-                case ">=":
-                    return "WHERE `meeting_id`>=" . str_replace(">=", "", $answer);
-                default:
-                    throw new \Exception('Unknown operand used.');
-            }
-        }
+        $query = "WHERE meeting_date IN (".$dateRange->toSQLQuery().")";
+        return $query;
     }
 }
