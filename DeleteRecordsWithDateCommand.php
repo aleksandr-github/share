@@ -57,33 +57,33 @@ class DeleteRecordsWithDateCommand extends Command
         $partialSQL = $this->getPartialMeetingSQLForAnswer($dateRange);
         $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
 
-        $io->warning("You're about to delete " . count($partialMeetings) . " meeting(s), along with races, records and historic data from DB.");
-        $proceed = $io->confirm("Are you sure you want to proceed?");
-        if ($proceed) {
-            foreach ($partialMeetings as $meeting) {
-                $io->text("Deleting meeting " . $meeting->getMeetingName() . ", please wait.");
-                $races = $this->raceService->getRacesWithPartialWhere("WHERE meeting_id = " . $meeting->getMeetingId(), true);
-
-                // delete races
-                $progress = new ProgressBar($io);
-                ProgressBar::setFormatDefinition('races_format', 'Deleting race of ID: %message%');
-                $progress->setFormat('races_format');
-                $progress->setMaxSteps(count($races));
-                foreach ($races as $race) {
-                    // historic results for race
-                    $progress->setMessage($race->getRaceId());
-                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_hist_results` WHERE `race_id` = " . $race->getRaceId());
-                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_temp_hraces` WHERE `race_id` = " . $race->getRaceId());
-                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_results` WHERE `race_id` = " . $race->getRaceId());
-                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_races` WHERE `race_id` = " . $race->getRaceId());
-
-                    $progress->advance();
-                }
-                $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_meetings` WHERE `meeting_id` = " . $meeting->getMeetingId());
-                $progress->finish();
-            }
-            $io->success("Meetings with it's corresponding data has been deleted.");
-        }
+        $io->warning("You're about to delete " . $partialMeetings . " meeting(s), along with races, records and historic data from DB.");
+//        $proceed = $io->confirm("Are you sure you want to proceed?");
+//        if ($proceed) {
+//            foreach ($partialMeetings as $meeting) {
+//                $io->text("Deleting meeting " . $meeting->getMeetingName() . ", please wait.");
+//                $races = $this->raceService->getRacesWithPartialWhere("WHERE meeting_id = " . $meeting->getMeetingId(), true);
+//
+//                // delete races
+//                $progress = new ProgressBar($io);
+//                ProgressBar::setFormatDefinition('races_format', 'Deleting race of ID: %message%');
+//                $progress->setFormat('races_format');
+//                $progress->setMaxSteps(count($races));
+//                foreach ($races as $race) {
+//                    // historic results for race
+//                    $progress->setMessage($race->getRaceId());
+//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_hist_results` WHERE `race_id` = " . $race->getRaceId());
+//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_temp_hraces` WHERE `race_id` = " . $race->getRaceId());
+//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_results` WHERE `race_id` = " . $race->getRaceId());
+//                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_races` WHERE `race_id` = " . $race->getRaceId());
+//
+//                    $progress->advance();
+//                }
+//                $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_meetings` WHERE `meeting_id` = " . $meeting->getMeetingId());
+//                $progress->finish();
+//            }
+//            $io->success("Meetings with it's corresponding data has been deleted.");
+//        }
 
         return Command::SUCCESS;
     }
