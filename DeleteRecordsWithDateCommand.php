@@ -51,6 +51,7 @@ class DeleteRecordsWithDateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
         $startDate = $input->getArgument('startDate');
         $endDate = $input->getArgument('endDate');
 
@@ -78,6 +79,36 @@ class DeleteRecordsWithDateCommand extends Command
 //        }
 
         $output->writeln($startDate.' '.$endDate);
+        $partialSQL = $this->getPartialMeetingSQLForAnswer($startDate, $endDate);
+        $partialMeetings = $this->meetingService->getWithPartialWhere($partialSQL, true);
+
+        $io->warning("You're about to delete " . count($partialMeetings) . " meeting(s), along with races, records and historic data from DB.");
+        $proceed = $io->confirm("Are you sure you want to proceed?");
+        if ($proceed) {
+            foreach ($partialMeetings as $meeting) {
+                $io->text("Deleting meeting " . $meeting->getMeetingName() . ", please wait.");
+                $races = $this->raceService->getRacesWithPartialWhere("WHERE meeting_id = " . $meeting->getMeetingId(), true);
+
+                // delete races
+                $progress = new ProgressBar($io);
+                ProgressBar::setFormatDefinition('races_format', 'Deleting race of ID: %message%');
+                $progress->setFormat('races_format');
+                $progress->setMaxSteps(count($races));
+                foreach ($races as $race) {
+                    // historic results for race
+                    $progress->setMessage($race->getRaceId());
+                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_hist_results` WHERE `race_id` = " . $race->getRaceId());
+                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_temp_hraces` WHERE `race_id` = " . $race->getRaceId());
+                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_results` WHERE `race_id` = " . $race->getRaceId());
+                    $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_races` WHERE `race_id` = " . $race->getRaceId());
+
+                    $progress->advance();
+                }
+                $this->dbConnector->getDbConnection()->query("DELETE FROM `tbl_meetings` WHERE `meeting_id` = " . $meeting->getMeetingId());
+                $progress->finish();
+            }
+            $io->success("Meetings with it's corresponding data has been deleted.");
+        }
 
         return Command::SUCCESS;
     }
@@ -85,6 +116,11 @@ class DeleteRecordsWithDateCommand extends Command
     protected function check_date($x): bool
     {
         return (date('Y-m-d', strtotime($x)) == $x);
+    }
+
+    private function getPartialMeetingSQLForAnswer(string $startDate, string $endDate): string
+    {
+        return  "WHERE `meeting_date` BETWEEN '".$startDate."' AND '".$endDate."'";
     }
 
     /**
