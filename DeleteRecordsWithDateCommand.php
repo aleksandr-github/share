@@ -13,6 +13,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -56,18 +57,22 @@ class DeleteRecordsWithDateCommand extends Command
     {
         $startDate = $input->getArgument('startDate');
         $endDate = $input->getArgument('endDate');
+        $text1 = "";
+        $text2 = "";
         if ($endDate) {
-            $text = 'endDate '.$endDate;
+            $text2 = 'endDate '.$endDate;
         }
         if ($startDate) {
-            $text = 'startDate '.$startDate;
+            $text1 = 'startDate '.$startDate;
         }
 
-        if ($input->getOption('yell')) {
-            $text = strtoupper($text)."ok";
-        }
+//        if ($input->getOption('yell')) {
+//            $text = strtoupper($text)."ok";
+//        }
 
-        $output->writeln($text);
+        $output->writeln($text1);
+        $output->writeln($text2);
+        return Command::SUCCESS;
     }
 
     /**
