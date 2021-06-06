@@ -113,27 +113,11 @@ class DeleteRecordsCommand extends Command
     private function getPartialMeetingSQLForAnswer(string $answer): string
     {
         if (strpos($answer, '-') > 0) {
-            $count = substr_count($answer, '-');
-            if($count >= 2){
-                $datesArray = explode(">", $answer);
-                $timestamp0 = $datesArray[0];
-
-                if(!isset($datesArray[1]))
-                    return  "WHERE `meeting_date` = '".$datesArray[0]."'";
-                $timestamp1 = strtotime($datesArray[1]);
-
-                if($timestamp0 >= $timestamp1) {
-                    throw new \LogicException("Range must valid.");
-                }
-                return  "WHERE `meeting_date` BETWEEN '".$datesArray[0]."' AND '".$datesArray[1]."'";
-            }
-            else{
                 $idsArray = explode("-", $answer);
                 if ($idsArray[0] >= $idsArray[1]) {
                     throw new \LogicException("Range must valid.");
                 }
                 return "WHERE `meeting_id` BETWEEN ".$idsArray[0]." AND ".$idsArray[1];
-            }
         } else {
             $sign = $answer[0];
             switch ($sign) {
