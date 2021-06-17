@@ -155,13 +155,11 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
     protected function getArrayOfHandicap($raceId, $raceDistance, $mysqli): array
     {
         $get_array = $mysqli->query("SELECT DISTINCT `horse_id` FROM `tbl_hist_results` WHERE `race_id`='$raceId' AND `race_distance`='$raceDistance'");
-        $arr = array();
+        $arr = [];
 
-        while ($arhorse = $get_array->fetch_object())
-        {
+        while ($arhorse = $get_array->fetch_object()) {
             $get_histar = $mysqli->query("SELECT MIN(handicap) as minihandi FROM `tbl_hist_results` WHERE `race_id`='$raceId' AND `race_distance`='$raceDistance' AND `horse_id`='$arhorse->horse_id'");
-            while ($ahandi = $get_histar->fetch_object())
-            {
+            while ($ahandi = $get_histar->fetch_object()) {
                 $arr[] = $ahandi->minihandi;
             }
         }
