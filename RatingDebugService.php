@@ -32,7 +32,6 @@ class RatingDebugService
     ): array
     {
         $steps = [];
-        $sumArray = [];
 
         // initial step:
         $index = $this->arraySearchPartial($generateHandicapRawData, 'AlgorithmStrategyInterface::generateHandicap()', $entryNumber);
