@@ -32,6 +32,7 @@ class RatingDebugService
     ): array
     {
         $steps = [];
+        $sumArray = [];
 
         // initial step:
         $index = $this->arraySearchPartial($generateHandicapRawData, 'AlgorithmStrategyInterface::generateHandicap()', $entryNumber);
@@ -145,6 +146,11 @@ class RatingDebugService
             //array_unshift($arrayOfHandicap, $stepVariables->MIN_HANDICAP + 1);
             $keys = array_keys($arrayOfHandicap, $stepVariables->MIN_HANDICAP);
 
+            //make sum array from $arrayOfHandicap and $nameArrayOfHandicap
+            foreach ($nameArrayOfHandicap as $key=>$v){
+                $sumArray[]=$arrayOfHandicap[$key].' '.$nameArrayOfHandicap[$key];
+            }
+
             $ratingTempLine = sprintf(
                 '%s / %s / 2 = %s',
                 array_sum($keys),
@@ -156,8 +162,7 @@ class RatingDebugService
                 'formula' => 'array_sum(array_keys(ARRAY_OF_HANDICAP, MIN(handicap))) / count(array_keys(ARRAY_OF_HANDICAP, MIN(handicap)) = rank',
                 'calculation' => $ratingTempLine,
                 'subCalculations' => (object)[
-                    'ARRAY_OF_HANDICAP' => (object)$arrayOfHandicap,
-                    'NAMEARRAY_OF_HANDICAP' => (object)$nameArrayOfHandicap,
+                    'ARRAY_OF_HANDICAP' => (object)$sumArray,
                     'array_keys(ARRAY_OF_HANDICAP, MIN(handicap))' => (object)$keys,
                     'array_sum(@arrayKeys)' => array_sum($keys),
                     'count(@arrayKeys)' => count($keys),
