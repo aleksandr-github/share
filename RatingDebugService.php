@@ -147,9 +147,7 @@ class RatingDebugService
             $keys = array_keys($arrayOfHandicap, $stepVariables->MIN_HANDICAP);
 
             //make sum array from $arrayOfHandicap and $nameArrayOfHandicap
-            foreach ($nameArrayOfHandicap as $key=>$v){
-                $sumArray[]=$arrayOfHandicap[$key].' '.$nameArrayOfHandicap[$key];
-            }
+            $sumArray = array_map(function ($x, $y) { return $x.'   '.$y; }, $arrayOfHandicap, $nameArrayOfHandicap);
 
             $ratingTempLine = sprintf(
                 '%s / %s / 2 = %s',
