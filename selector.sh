@@ -1,9 +1,11 @@
 #!/bin/bash
 echo 'starting'
-if [ -f .env.dev ]
+selector=1
+if [ -f .env.dev1 ]
 then  
     source .env.dev
     echo $selector
 fi
+echo $selector
 
 
