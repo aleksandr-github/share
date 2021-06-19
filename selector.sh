@@ -1,16 +1,16 @@
 #!/bin/bash
-echo 'starting'
+echo '############### Starting ##################'
 selector=1
 if [ -f .env.dev ]
 then  
     source .env.dev
-    echo $selector
+    #echo $selector
 fi
-echo $selector
+#echo $selector
 # iterater
-for ((a=1; a <= $selector ; a++))
+for ((s=1; s <= $selector ; s++))
 do
-   printf 'Running test %s\n' "$selector"
+   printf 'Running test %s\n' "$s"
    # php bin/console run:algo RANK
    # echo profit/loss $variableused somefile.txt
 done
