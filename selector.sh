@@ -1,5 +1,9 @@
 #!/bin/bash
-if [ -f .env.prod ]
-then
-  export $(cat .env | sed 's/#.*//g' | xargs)
+echo 'starting'
+if [ -f .env.dev ]
+then  
+    source .env.dev
+    echo $selector
 fi
+
+
