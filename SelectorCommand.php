@@ -69,7 +69,7 @@ class SelectorCommand extends Command
         $output->writeln($selector);
 
         $client = HttpClient::createForBaseUri($_ENV['appUrl']);
-        $request = $client->request('GET', '/api/avg_rank', ['odds' => 'true', 'limit' => '4']);
+        $request = $client->request('GET', '/api/avg_rank?odds=true');
         $jsonContent = $request->getContent();
         $avgTotalProfit = json_decode($jsonContent)->absoluteTotal;
         $fileName = 'selector'.$selector.'.txt';
