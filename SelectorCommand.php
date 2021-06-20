@@ -75,7 +75,7 @@ class SelectorCommand extends Command
         $fileName = 'selector'.$selector.'.txt';
 
         $this->logger = new PrettyLogger(__FILE__, $fileName);
-        $this->logger->log("Fetching selector: " . $selector);
+        $this->logger->log("Fetching selector: " . $avgTotalProfit);
         $io->success("Selector operation finished. Check selector.txt for details.");
 
         return Command::SUCCESS;
