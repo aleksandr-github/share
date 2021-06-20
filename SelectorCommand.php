@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Dotenv\Dotenv;
 
 class SelectorCommand extends Command
 {
@@ -42,7 +43,9 @@ class SelectorCommand extends Command
             ->setName('selector')
             ->setDescription('Greet selector')
             ->addArgument('selector', InputArgument::OPTIONAL, 'What is Selector?')
-            ->addOption('selectorOption', null, InputOption::VALUE_NONE, 'If set, the task will yell in uppercase letters')
+            ->addArgument('timerHandicapMultiplier', InputArgument::OPTIONAL, 'Custom timer handicap multiplier value')
+            ->addArgument('positionPercentage', InputArgument::OPTIONAL, 'Position Percentage modifier')
+            ->addArgument('handicapModifier', InputArgument::OPTIONAL, 'Handicap Modifier');
         ;
     }
 
@@ -52,7 +55,7 @@ class SelectorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $selector = $input->getArgument('selector');
+        $selector = $input->getArgument('selector') ?? 1;
         $timerHandicapMultiplier = $input->getArgument('timerHandicapMultiplier') ?? $_ENV['timerHandicapMultiplier'];
         $positionPercentage = $input->getArgument('positionPercentage') ?? $_ENV['positionPercentage'];
         $handicapModifier = $input->getArgument('handicapModifier') ?? $_ENV['handicapModifier'];
