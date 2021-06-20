@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DeleteRecordsWithDateCommand extends Command
+class SelectorCommand extends Command
 {
     protected static $defaultName = 'run:selectorQuery';
     protected $raceService;
