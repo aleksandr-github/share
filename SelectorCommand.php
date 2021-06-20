@@ -57,7 +57,7 @@ class SelectorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $selector = $input->getArgument('selector') ?? 1;
+        $selector = $input->getArgument('selector') ?? $_ENV['selector'];
         $timerHandicapMultiplier = $input->getArgument('timerHandicapMultiplier') ?? $_ENV['timerHandicapMultiplier'];
         $positionPercentage = $input->getArgument('positionPercentage') ?? $_ENV['positionPercentage'];
         $handicapModifier = $input->getArgument('handicapModifier') ?? $_ENV['handicapModifier'];
