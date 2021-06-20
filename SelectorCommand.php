@@ -18,6 +18,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpClient\HttpClient;
+use App\Service\PrettyLogger;
 
 class SelectorCommand extends Command
 {
@@ -71,10 +72,11 @@ class SelectorCommand extends Command
         $request = $client->request('GET', '/api/avg_rank', ['odds' => 'true', 'limit' => '4']);
         $jsonContent = $request->getContent();
         $avgTotalProfit = json_decode($jsonContent)->absoluteTotal;
+        $fileName = 'selector'.$selector.'.txt';
 
-        $this->logger = new PrettyLogger(__FILE__, 'selector.txt');
+        $this->logger = new PrettyLogger(__FILE__, $fileName);
         $this->logger->log("Fetching selector: " . $selector);
-
+        $io->success("Selector operation finished. Check selector.txt for details.");
 
         return Command::SUCCESS;
     }
