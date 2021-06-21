@@ -60,10 +60,10 @@ class AverageRankFieldResultSetService
 
 
         //get distance from database
-//        for($i = 0; $i < count($race_id); $i++){
-        for($i = 0; $i < 2; $i++) {
+        for($i = 0; $i < count($race_id); $i++){
+//        for($i = 0; $i < 20; $i++) {
 //            for($j = 0; $i < count($horse_id); $j++){
-            for ($j = 0; $j < 2; $j++) {
+            for ($j = 0; $j < 40; $j++) {
                 $distance = [];
                 $queryD = "SELECT race_distance FROM tbl_hist_results WHERE race_id=" . $race_id[$i] . " and horse_id=" . $horse_id[$j] . " GROUP BY race_distance";
                 // get race id from database
