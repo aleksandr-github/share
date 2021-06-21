@@ -26,6 +26,8 @@ class HorseController extends AbstractController
     public function index(): Response
     {
         $sql_horseid = "SELECT horse_id  FROM `tbl_horses`";
+        $sql_raceid = "SELECT race_id  FROM tbl_races";
+
         // get horse id from database
         $result_horseid = $this->dbConnector->getDbConnection()->query($sql_horseid);
         $horse_id = array();
@@ -37,8 +39,25 @@ class HorseController extends AbstractController
             }
         }
 
+        // get race id from database
+        $result_raceid = $this->dbConnector->getDbConnection()->query($sql_raceid);
+        $race_id = array();
+        if ($result_raceid->num_rows > 0)
+        {
+            while ($row_id = $result_raceid->fetch_assoc())
+            {
+                $race_id[] = $row_id['race_id'];
+            }
+        }
+
+        $combine = array();
+        for($i = 0; $i < count($horse_id); $i++){
+            $combine[] = $horse_id[$i] . 'combine' . $race_id[$i];
+        }
         return $this->render('horses.html.twig', [
-            'horses' => $horse_id
+            'horses' => $horse_id,
+            'races' => $race_id,
+            'combines' => $combine
         ]);
     }
 

@@ -12,35 +12,34 @@
         <div class="">
             <h1>Horses Data</h1>
             <div class="">
-                <table id="employee_grid" class="display" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Horse Name</th>
-                            <th>Horse Slug</th>
-                            <th>Horse Latest Results</th>
-                            <th>Added On</th>
-                        </tr>
-                    </thead>
+                <table class="display" width="100%" cellspacing="0" border="1">
                     <tbody>
                     {% for horse in horses %}
                         <tr>
-                            <td>
-                                <a href="{{ path('horse_details', {'horse': horse.horseId}) }}">{{ horse.horseName }}</a>
-                            </td>
                             <td>{{ horse }}</td>
-                            <td></td>
-                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                    <tfoot>
+                </table>
+
+                <table class="display" width="100%" cellspacing="0" border="1">
+                    <tbody>
+                    {% for race in races %}
                         <tr>
-                            <th>Horse Name</th>
-                            <th>Horse Slug</th>
-                            <th>Horse Latest Results</th>
-                            <th>Added On</th>
+                            <td>{{ race }}</td>
                         </tr>
-                    </tfoot>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <table class="display" width="100%" cellspacing="0" border="1">
+                    <tbody>
+                    {% for combine in combines %}
+                        <tr>
+                            <td>{{ combine }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -49,7 +48,7 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-       
+
     </script>
 {% endblock %}
 
