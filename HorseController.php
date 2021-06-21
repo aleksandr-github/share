@@ -61,7 +61,7 @@ class HorseController extends AbstractController
 //        for($i = 0; $i < count($race_id); $i++){
         for($i = 0; $i < 2; $i++){
 //            for($j = 0; $i < count($horse_id); $j++){
-            for($j = 0; $i < 2; $j++){
+            for($j = 0; $j < 2; $j++){
                 $distance = [];
                 $query = "SELECT race_distance FROM tbl_hist_results WHERE race_id=".$race_id[$i]." and horse_id=".$horse_id[$j]." GROUP BY race_distance";
                 // get race id from database
@@ -84,7 +84,7 @@ class HorseController extends AbstractController
                         {
                             $temp_array[] = [
                                 'rating' => $row->rating,
-                                'rank' => $row->ranks,
+                                'rank' => $row->rank,
                                 'horse_fixed_odds' => $row->horse_fixed_odds,
                                 'position' => $row->horse_position
                             ];
