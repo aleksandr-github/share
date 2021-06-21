@@ -26,7 +26,7 @@ class AverageRankFieldResultSetService
      * @param bool $oddsEnabled
      * @return \App\Model\AverageRankFieldResultSet
      */
-    public function generateAvgRankFieldSelectorResultSet(Request $request, bool $oddsEnabled, int $limit = null, int $offset = null, int $selector = null): AverageRankFieldResultSet
+    public function generateAvgRankFieldSelectorResultSet(Request $request, bool $oddsEnabled, int $limit = null, int $offset = null, int $selector = null)
     {
         $avgRankFieldResultSet = new AverageRankFieldResultSet();
 
@@ -212,7 +212,7 @@ class AverageRankFieldResultSetService
         }
         $avgRankFieldResultSet->setResults($realResultsAVGArray);
 
-        return $avgRankFieldResultSet;
+        return $result_horseid;
     }
 
     /**
