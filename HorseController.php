@@ -51,12 +51,12 @@ class HorseController extends AbstractController
         }
 
         $combine = array();
-        for($i = 0; $i < count($horse_id); $i++){
+        for($i = 0; $i < count($race_id); $i++){
             $combine[] = $horse_id[$i] . 'combine' . $race_id[$i];
         }
         return $this->render('horses.html.twig', [
             'horses' => $horse_id,
-            'races' => $race_id,
+            'race_ids' => $race_id,
             'combines' => $combine
         ]);
     }

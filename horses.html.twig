@@ -12,6 +12,8 @@
         <div class="">
             <h1>Horses Data</h1>
             <div class="">
+            
+<h2>                horse table</h2>
                 <table class="display" width="100%" cellspacing="0" border="1">
                     <tbody>
                     {% for horse in horses %}
@@ -21,10 +23,12 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                
+<h2>                race table</h2>
 
                 <table class="display" width="100%" cellspacing="0" border="1">
                     <tbody>
-                    {% for race in races %}
+                    {% for race in race_ids %}
                         <tr>
                             <td>{{ race }}</td>
                         </tr>
@@ -32,6 +36,7 @@
                     </tbody>
                 </table>
 
+<h2>                combine table</h2>
                 <table class="display" width="100%" cellspacing="0" border="1">
                     <tbody>
                     {% for combine in combines %}
