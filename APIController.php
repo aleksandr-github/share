@@ -57,7 +57,7 @@ class APIController extends AbstractAPIController
         $oddsEnabled = $request->get('odds');
         $limit = $request->get('limit');
         $offset = $request->get('offset');
-        $offset = $request->get('selector');
+        $selector = $request->get('selector');
         if ($oddsEnabled == null || $oddsEnabled == "null") {
             $oddsEnabled = false;
         }

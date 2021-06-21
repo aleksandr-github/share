@@ -70,7 +70,7 @@ class SelectorCommand extends Command
         $output->writeln($selector);
 
         $client = HttpClient::createForBaseUri($_ENV['appUrl']);
-        $request = $client->request('GET', '/api/avg_rank_selector');
+        $request = $client->request('GET', '/api/avg_rank_selector?selector='.$selector);
         $jsonContent = $request->getContent();
         $avgTotalProfit = json_decode($jsonContent)->absoluteTotal;
         $totalProfit = json_decode($jsonContent)->totalProfit;
