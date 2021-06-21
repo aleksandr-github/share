@@ -66,11 +66,15 @@ class APIController extends AbstractAPIController
         $rs = $this->averageRankFieldResultSetService->generateAvgRankFieldSelectorResultSet($request, $oddsEnabled, $limit, $offset, $selector);
 
         return $this->response([
-            'absoluteTotal' => $formatter->formatCurrency($rs->getAbsoluteTotal(), 'USD'),
-            'totalProfit' => $formatter->formatCurrency($rs->getTotalProfit(), 'USD'),
-            'totalLoss' => '-'.$formatter->formatCurrency($rs->getTotalLoss(), 'USD'),
-            'cssClass' => ($rs->getAbsoluteTotal() > 0)?'alert-success':'alert-danger'
+            'rs' => $rs
         ], JsonResponse::HTTP_OK);
+
+//        return $this->response([
+//            'absoluteTotal' => $formatter->formatCurrency($rs->getAbsoluteTotal(), 'USD'),
+//            'totalProfit' => $formatter->formatCurrency($rs->getTotalProfit(), 'USD'),
+//            'totalLoss' => '-'.$formatter->formatCurrency($rs->getTotalLoss(), 'USD'),
+//            'cssClass' => ($rs->getAbsoluteTotal() > 0)?'alert-success':'alert-danger'
+//        ], JsonResponse::HTTP_OK);
     }
 
 
