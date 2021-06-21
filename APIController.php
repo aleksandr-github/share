@@ -57,17 +57,16 @@ class APIController extends AbstractAPIController
         $oddsEnabled = $request->get('odds');
         $limit = $request->get('limit');
         $offset = $request->get('offset');
+        $offset = $request->get('selector');
         if ($oddsEnabled == null || $oddsEnabled == "null") {
             $oddsEnabled = false;
         }
 
         $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
-        $rs = $this->averageRankFieldResultSetService->generateAvgRankFieldResultSet($request, $oddsEnabled, $limit, $offset);
-        $transformedData = $this->rankResultSetAPITransformer->transform($rs);
+        $rs = $this->averageRankFieldResultSetService->generateAvgRankFieldSelectorResultSet($request, $oddsEnabled, $limit, $offset, $selector);
 
         return $this->response([
-            'data' => $transformedData,
-            'absoluteTotal' => $formatter->formatCurrency(5000, 'USD'),
+            'absoluteTotal' => $formatter->formatCurrency($rs->getAbsoluteTotal(), 'USD'),
             'totalProfit' => $formatter->formatCurrency($rs->getTotalProfit(), 'USD'),
             'totalLoss' => '-'.$formatter->formatCurrency($rs->getTotalLoss(), 'USD'),
             'cssClass' => ($rs->getAbsoluteTotal() > 0)?'alert-success':'alert-danger'

@@ -54,6 +54,7 @@ class SelectorCommand extends Command
     /**
      * @throws \Exception
      */
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -72,11 +73,15 @@ class SelectorCommand extends Command
         $request = $client->request('GET', '/api/avg_rank_selector');
         $jsonContent = $request->getContent();
         $avgTotalProfit = json_decode($jsonContent)->absoluteTotal;
+        $totalProfit = json_decode($jsonContent)->totalProfit;
+        $totalLoss = json_decode($jsonContent)->totalLoss;
         $fileName = 'selector'.$selector.'.txt';
 
         $this->logger = new PrettyLogger(__FILE__, $fileName);
-        $this->logger->log("Fetching selector: " . $avgTotalProfit);
-        $io->success("Selector operation finished. Check selector.txt for details.");
+        $this->logger->log("absoluteTotal: " . $avgTotalProfit);
+        $this->logger->log("totalProfit: " . $totalProfit);
+        $this->logger->log("totalLoss: " . $totalLoss);
+        $io->success("Selector operation finished. Check ".$fileName." for details.");
 
         return Command::SUCCESS;
     }
