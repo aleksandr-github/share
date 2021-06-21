@@ -58,8 +58,10 @@ class HorseController extends AbstractController
         }
 
         //get distance from database
-        for($i = 0; $i < count($race_id); $i++){
-            for($j = 0; $i < count($horse_id); $j++){
+//        for($i = 0; $i < count($race_id); $i++){
+        for($i = 0; $i < 2; $i++){
+//            for($j = 0; $i < count($horse_id); $j++){
+            for($j = 0; $i < 2; $j++){
                 $distance = [];
                 $query = "SELECT race_distance FROM tbl_hist_results WHERE race_id=".$race_id[$i]." and horse_id=".$horse_id[$j]." GROUP BY race_distance";
                 // get race id from database
@@ -73,7 +75,7 @@ class HorseController extends AbstractController
                 }
                 for($k = 0; $k < count($distance); $k++){
                     $temp_array = [];
-                    $query = "SELECT race_distance FROM tbl_hist_results WHERE race_id=".$race_id[$i]." and horse_id=".$horse_id[$j]." and race_distance='".$distance[$k]."' order by horse_position";
+                    $query = "SELECT * FROM tbl_hist_results WHERE race_id=".$race_id[$i]." and horse_id=".$horse_id[$j]." and race_distance='".$distance[$k]."' order by horse_position";
                     // get race id from database
                     $result = $this->dbConnector->getDbConnection()->query($query);
                     if ($result->num_rows > 0)
