@@ -67,17 +67,10 @@ class APIController extends AbstractAPIController
 
         return $this->response([
             'absoluteTotal' => $rs[0],
-            'totalProfit' => '7',
-            'totalLoss' => '12',
-            'cssClass' => '14'
+            'totalProfit' => $rs[1],
+            'totalLoss' => $rs[2]
         ], JsonResponse::HTTP_OK);
 
-//        return $this->response([
-//            'absoluteTotal' => $formatter->formatCurrency($rs->getAbsoluteTotal(), 'USD'),
-//            'totalProfit' => $formatter->formatCurrency($rs->getTotalProfit(), 'USD'),
-//            'totalLoss' => '-'.$formatter->formatCurrency($rs->getTotalLoss(), 'USD'),
-//            'cssClass' => ($rs->getAbsoluteTotal() > 0)?'alert-success':'alert-danger'
-//        ], JsonResponse::HTTP_OK);
     }
 
 

@@ -48,11 +48,13 @@ class AverageRankFieldResultSetService
         $realResultsAVGArray = [];
         if ($result_raceid->num_rows > 0)
         {
+            $dd = 30;
             // output data of each row
             while ($row_id = $result_raceid->fetch_assoc())
             {
                 $resultsForRaceArray = $this->getResultsForRace($row_id['race_id']);//tbl_results
                 $temp_array = array();
+                $dd = 50;
                 //$topIds = $this->generateTopIds($row_id['race_id']);
 
                 if ($result_horseid->num_rows > 0)
@@ -68,7 +70,7 @@ class AverageRankFieldResultSetService
                                         $horseDatum->setPosition($position);
                                     }
                                 }
-
+$dd = 100;
                                 $temp_array[] = $horseDatum;
                             }
                         }
@@ -79,140 +81,140 @@ class AverageRankFieldResultSetService
                     return strcmp($a->getRank(), $b->getRank()) * -1;
                 });
 
-                if (count($temp_array) > 0) {
-                    try {
-                        switch ($selector) {
-                            case 1:
-                                $real_result = array(
-                                    $temp_array[0]
-                                );
-                                break;
-                            case 2:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1]
-                                );
-                                break;
-                            case 3:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2]
-                                );
-                                break;
-                            case 4:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3]
-                                );
-                                break;
-                            case 5:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4]
-                                );
-                                break;
-                            case 6:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4],
-                                    $temp_array[5]
-                                );
-                                break;
-                            case 7:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4],
-                                    $temp_array[5],
-                                    $temp_array[6]
-                                );
-                                break;
-                            case 8:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4],
-                                    $temp_array[5],
-                                    $temp_array[6],
-                                    $temp_array[7]
-                                );
-                                break;
-                            case 9:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4],
-                                    $temp_array[5],
-                                    $temp_array[6],
-                                    $temp_array[7],
-                                    $temp_array[8]
-                                );
-                                break;
-                            case 10:
-                            default:
-                                $real_result = array(
-                                    $temp_array[0],
-                                    $temp_array[1],
-                                    $temp_array[2],
-                                    $temp_array[3],
-                                    $temp_array[4],
-                                    $temp_array[5],
-                                    $temp_array[6],
-                                    $temp_array[7],
-                                    $temp_array[8],
-                                    $temp_array[9]
-                                );
-                                break;
-                        }
-
-                        $race = $this->dbConnector->getRaceDetails($row_id['race_id']);//tbl_races
-                        $meeting = $this->dbConnector->getMeetingDetails($race->getMeetingId());
-                        if (count($real_result) > 0) {
-                            /** @var HorseDataModel $horseDataModel */
-                            foreach ($real_result as $horseDataModel) {
-                                $avgRank = number_format($horseDataModel->getRank(true), 2);
-                                //$profit = in_array($horseDataModel->getHorseId(), $topIds) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
-                                $profit = ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
-                                $totalProfitAVR += $profit;
-                                $avgRankFieldResultSet->calculateAbsoluteTotal($profit);
-
-                                $realResultsAVGArray[] = [
-                                    'raceId' => $horseDataModel->getRaceId(),
-                                    'horseId' => $horseDataModel->getHorseId(),
-                                    'horse' => $horseDataModel->getHorseName(),
-                                    'race' => $race,
-                                    'meeting' => $meeting,
-                                    'rating' => number_format($horseDataModel->getRating(true), 2),
-                                    'avgRank' => $avgRank,
-                                    'revenue' => $profit,
-                                    'total' => $totalProfitAVR
-                                ];
-                            }
-                        }
-                    } catch (\Throwable $e) {
-                        // todo it fails
-                    }
-                }
+//                if (count($temp_array) > 0) {
+//                    try {
+//                        switch ($selector) {
+//                            case 1:
+//                                $real_result = array(
+//                                    $temp_array[0]
+//                                );
+//                                break;
+//                            case 2:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1]
+//                                );
+//                                break;
+//                            case 3:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2]
+//                                );
+//                                break;
+//                            case 4:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3]
+//                                );
+//                                break;
+//                            case 5:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4]
+//                                );
+//                                break;
+//                            case 6:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4],
+//                                    $temp_array[5]
+//                                );
+//                                break;
+//                            case 7:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4],
+//                                    $temp_array[5],
+//                                    $temp_array[6]
+//                                );
+//                                break;
+//                            case 8:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4],
+//                                    $temp_array[5],
+//                                    $temp_array[6],
+//                                    $temp_array[7]
+//                                );
+//                                break;
+//                            case 9:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4],
+//                                    $temp_array[5],
+//                                    $temp_array[6],
+//                                    $temp_array[7],
+//                                    $temp_array[8]
+//                                );
+//                                break;
+//                            case 10:
+//                            default:
+//                                $real_result = array(
+//                                    $temp_array[0],
+//                                    $temp_array[1],
+//                                    $temp_array[2],
+//                                    $temp_array[3],
+//                                    $temp_array[4],
+//                                    $temp_array[5],
+//                                    $temp_array[6],
+//                                    $temp_array[7],
+//                                    $temp_array[8],
+//                                    $temp_array[9]
+//                                );
+//                                break;
+//                        }
+//
+//                        $race = $this->dbConnector->getRaceDetails($row_id['race_id']);//tbl_races
+//                        $meeting = $this->dbConnector->getMeetingDetails($race->getMeetingId());
+//                        if (count($real_result) > 0) {
+//                            /** @var HorseDataModel $horseDataModel */
+//                            foreach ($real_result as $horseDataModel) {
+//                                $avgRank = number_format($horseDataModel->getRank(true), 2);
+//                                //$profit = in_array($horseDataModel->getHorseId(), $topIds) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
+//                                $profit = ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel);
+//                                $totalProfitAVR += $profit;
+//                                $avgRankFieldResultSet->calculateAbsoluteTotal($profit);
+//
+//                                $realResultsAVGArray[] = [
+//                                    'raceId' => $horseDataModel->getRaceId(),
+//                                    'horseId' => $horseDataModel->getHorseId(),
+//                                    'horse' => $horseDataModel->getHorseName(),
+//                                    'race' => $race,
+//                                    'meeting' => $meeting,
+//                                    'rating' => number_format($horseDataModel->getRating(true), 2),
+//                                    'avgRank' => $avgRank,
+//                                    'revenue' => $profit,
+//                                    'total' => $totalProfitAVR
+//                                ];
+//                            }
+//                        }
+//                    } catch (\Throwable $e) {
+//                        // todo it fails
+//                    }
+//                }
             }
         }
         $avgRankFieldResultSet->setResults($realResultsAVGArray);
         
-                    $realResultsAVGArray = array($selector);
+        $realResultsAVGArray = array($selector, $dd);
                                 
 
        return $realResultsAVGArray;
