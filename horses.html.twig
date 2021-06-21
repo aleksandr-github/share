@@ -12,39 +12,35 @@
         <div class="">
             <h1>Horses Data</h1>
             <div class="">
-            
-<h2>                horse table</h2>
-                <table class="display" width="100%" cellspacing="0" border="1">
-                    <tbody>
-                    {% for temp_array in temp_arrays %}
+                <table id="employee_grid" class="display" width="100%" cellspacing="0">
+                    <thead>
                         <tr>
-                            <td>{{ temp_array }}</td>
+                            <th>Horse Name</th>
+                            <th>Horse Slug</th>
+                            <th>Horse Latest Results</th>
+                            <th>Added On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for horse in horses %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('horse_details', {'horse': horse.horseId}) }}">{{ horse.horseName }}</a>
+                            </td>
+                            <td>{{ horse.horseSlug }}</td>
+                            <td>{{ horse.horseLatestResults }}</td>
+                            <td>{{ horse.horseAddedOn }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                </table>
-                
-<h2>                race table</h2>
-
-                <table class="display" width="100%" cellspacing="0" border="1">
-                    <tbody>
-                    {% for race in race_ids %}
+                    <tfoot>
                         <tr>
-                            <td>{{ race }}</td>
+                            <th>Horse Name</th>
+                            <th>Horse Slug</th>
+                            <th>Horse Latest Results</th>
+                            <th>Added On</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-<h2>                combine table</h2>
-                <table class="display" width="100%" cellspacing="0" border="1">
-                    <tbody>
-                    {% for combine in combines %}
-                        <tr>
-                            <td>{{ combine }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -53,7 +49,12 @@
 
 {% block javascripts %}
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('#employee_grid').DataTable({
 
+                "responsive": true,
+            });
+        });
     </script>
 {% endblock %}
 
