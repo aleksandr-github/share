@@ -61,7 +61,6 @@ class AverageRankFieldResultSetService
 
         //get distance from database
         for($i = 0; $i < count($race_id); $i++){
-//        for($i = 0; $i < 20; $i++) {
 //            for($j = 0; $i < count($horse_id); $j++){
             for ($j = 0; $j < 40; $j++) {
                 $distance = [];
@@ -75,33 +74,37 @@ class AverageRankFieldResultSetService
                     }
 
                     $temp_array = [];
-                    for ($k = 0; $k < count($distance); $k++) {
-                        $query = "SELECT * FROM tbl_hist_results WHERE race_id=" . $race_id[$i] . " and horse_id=" . $horse_id[$j] . " and race_distance='" . $distance[$k] . "' order by horse_position";
-                        // get race id from database
-                        $result = $this->dbConnector->getDbConnection()->query($query);
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_object()) {
-                                $avgRank = number_format($row->rank, 2);
-                                $position = $row->horse_position;
-                                $odds = str_replace("$", "", $row->horse_fixed_odds);
-                                $profit = ($position == "" ? 0 : (($position == 1) ? ((10 * $odds) - 10) : -10));
-                                $totalProfitAVR += $profit;
-                                $avgRankFieldResultSet->calculateAbsoluteTotal($profit);
+                    try {
+                        for ($k = 0; $k < count($distance); $k++) {
+                            $query = "SELECT * FROM tbl_hist_results WHERE race_id=" . $race_id[$i] . " and horse_id=" . $horse_id[$j] . " and race_distance='" . $distance[$k] . "' order by horse_position";
+                            // get race id from database
+                            $result = $this->dbConnector->getDbConnection()->query($query);
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_object()) {
+                                    $avgRank = number_format($row->rank, 2);
+                                    $position = $row->horse_position;
+                                    $odds = str_replace("$", "", $row->horse_fixed_odds);
+                                    $profit = ($position == "" ? 0 : (($position == 1) ? ((10 * $odds) - 10) : -10));
+                                    $totalProfitAVR += $profit;
+                                    $avgRankFieldResultSet->calculateAbsoluteTotal($profit);
 
-                                $temp_array[] = [
-                                    'raceId' => $race_id[$i],
-                                    'horseId' => $horse_id[$j],
-                                    'horse' => '',
-                                    'race' => '',
-                                    'meeting' => '',
-                                    'avgRank' => $avgRank,
-                                    'revenue' => $profit,
-                                    'total' => $totalProfitAVR
-                                ];
-                                if (count($temp_array) >= $selector)
-                                    break;
+                                    $temp_array[] = [
+                                        'raceId' => $race_id[$i],
+                                        'horseId' => $horse_id[$j],
+                                        'horse' => '',
+                                        'race' => '',
+                                        'meeting' => '',
+                                        'avgRank' => $avgRank,
+                                        'revenue' => $profit,
+                                        'total' => $totalProfitAVR
+                                    ];
+                                    if (count($temp_array) >= $selector)
+                                        break;
+                                }
                             }
                         }
+                    }catch (\Throwable $e) {
+                        // todo it fails
                     }
                 }
             }
