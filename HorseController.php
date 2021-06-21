@@ -53,6 +53,7 @@ class HorseController extends AbstractController
         }
 
         $combine = array();
+        $temp_array = array();
         for($i = 0; $i < count($race_id); $i++){
             $combine[] = $horse_id[$i] . 'combine' . $race_id[$i];
         }
