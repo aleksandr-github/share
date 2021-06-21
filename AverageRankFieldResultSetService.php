@@ -31,7 +31,7 @@ class AverageRankFieldResultSetService
         $avgRankFieldResultSet = new AverageRankFieldResultSet();
 
         $horseRatingData = $this->generateHorseRatingData($oddsEnabled);//tbl_hist_results
-        $horseData = $this->generateSelectorHorseData($horseRatingData, $oddsEnabled);
+        $horseData = $this->generateHorseData($horseRatingData, $oddsEnabled);
 
 
         $totalProfitAVR = 0;
@@ -42,37 +42,41 @@ class AverageRankFieldResultSetService
         }
         $sql_horseid = "SELECT horse_id  FROM tbl_horses";
 
-        $result_raceid = $this->dbConnector->getDbConnection()->query($sql_raceid);
+        // get horse id from database
         $result_horseid = $this->dbConnector->getDbConnection()->query($sql_horseid);
+        $horse_id = array();
+        if ($result_horseid->num_rows > 0)
+        {
+            while ($row_id = $result_horseid->fetch_assoc())
+            {
+                $horse_id[] = $row_id['horse_id'];
+            }
+        }
+
+
+        $result_raceid = $this->dbConnector->getDbConnection()->query($sql_raceid);
 
         $realResultsAVGArray = [];
         if ($result_raceid->num_rows > 0)
         {
-            $dd = 30;
             // output data of each row
             while ($row_id = $result_raceid->fetch_assoc())
             {
                 $resultsForRaceArray = $this->getResultsForRace($row_id['race_id']);//tbl_results
                 $temp_array = array();
-                $dd = 50;
                 //$topIds = $this->generateTopIds($row_id['race_id']);
 
-                if ($result_horseid->num_rows > 0)
-                {
-                    while ($horse_id = $result_horseid->fetch_assoc())
-                    {
-                        /** @var HorseDataModel $horseDatum */
-                        foreach ($horseData as $horseDatum) {
-                            if (($row_id['race_id'] == $horseDatum->getRaceId())&&($horse_id['horse_id'] == $horseDatum->getHistId())) {
-                                if (!empty($resultsForRaceArray)) {
-                                    $position = $this->getPositionByHorseId($resultsForRaceArray, $horseDatum->getHorseId());
-                                    if ($position) {
-                                        $horseDatum->setPosition($position);
-                                    }
+                foreach ($horse_id as $horse_idum) {
+                    /** @var HorseDataModel $horseDatum */
+                    foreach ($horseData as $horseDatum) {
+                        if (($row_id['race_id'] == $horseDatum->getRaceId())&&($horse_idum == $horseDatum->getHistId())) {
+                            if (!empty($resultsForRaceArray)) {
+                                $position = $this->getPositionByHorseId($resultsForRaceArray, $horseDatum->getHorseId());
+                                if ($position) {
+                                    $horseDatum->setPosition($position);
                                 }
-$dd = 100;
-                                $temp_array[] = $horseDatum;
                             }
+                            $temp_array[] = $horseDatum;
                         }
                     }
                 }
@@ -214,7 +218,7 @@ $dd = 100;
         }
         $avgRankFieldResultSet->setResults($realResultsAVGArray);
         
-        $realResultsAVGArray = array($selector, $dd);
+        $realResultsAVGArray = array($selector, $horse_id, 70);
                                 
 
        return $realResultsAVGArray;
