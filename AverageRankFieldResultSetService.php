@@ -211,8 +211,11 @@ class AverageRankFieldResultSetService
             }
         }
         $avgRankFieldResultSet->setResults($realResultsAVGArray);
+        
+                    $realResultsAVGArray = array($selector);
+                                
 
-        return $result_horseid;
+       return $realResultsAVGArray;
     }
 
     /**
