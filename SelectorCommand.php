@@ -77,7 +77,8 @@ class SelectorCommand extends Command
         $totalLoss = json_decode($jsonContent)->totalLoss;
         $fileName = 'selector'.$selector.'.txt';
 
-        $this->logger = new PrettyLogger(__FILE__, $fileName);
+        $this->logger = new PrettyLogger(__FILE__.DIRECTORY_SEPARATOR.'selector', $fileName);
+        $this->logger->log("selector: " . $selector);
         $this->logger->log("absoluteTotal: " . $avgTotalProfit);
         $this->logger->log("totalProfit: " . $totalProfit);
         $this->logger->log("totalLoss: " . $totalLoss);
