@@ -57,6 +57,21 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
      */
     private function updateRankForRace(object $race, mysqli $mysqli)
     {
+        //getting rank array from hist_table
+        $horseQuery = "SELECT horse_id  FROM `tbl_hist_results` GROUP BY horse_id ORDER BY horse_id";
+        $horseIDs = $mysqli->query($horseQuery);
+        while ($horseID = $horseIDs->fetch_object()) {
+            $arrayRankByHorse = $this->getArrayOfRank(
+                $race->race_id,
+                $horseID->horse_id,
+                $mysqli
+            );//For one horse
+            $arrayRankByDistance = implode("@", $arrayRankByHorse);//by distance
+            $arrayAvgRankByDistance[] = $arrayRankByDistance;
+        }
+
+        $arrayAvgRankByHorse = implode("&", $arrayAvgRankByDistance);//by horse
+
         $horsesCount = $mysqli->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='" . $this->data->race_id . "' AND `horse_fxodds`!='0'")->num_rows;
 
         $qDistance = "SELECT DISTINCT CAST(race_distance AS UNSIGNED) AS racedist 
@@ -123,7 +138,8 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                                     'RANK' => $rank,
                                     'MIN_HANDICAP' => $row->minihandi,
                                     'ARRAY_OF_HANDICAP' => implode("@", $numsArray),
-                                    'NAMEARRAY_OF_HANDICAP' => implode("@", $namesArray)
+                                    'NAMEARRAY_OF_HANDICAP' => implode("@", $namesArray),
+                                    'CALCULATION OF AVERAGE RANK' => $arrayAvgRankByHorse
                                 ]);
 
                                 $q = "UPDATE `tbl_hist_results` 
@@ -184,4 +200,52 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
         return $arr;
     }
+
+    protected function getArrayOfRank($raceId, $horseID, $mysqli): array
+    {
+        $qDistance = "SELECT DISTINCT CAST(race_distance AS UNSIGNED) AS racedist 
+                          FROM tbl_hist_results 
+                          WHERE `race_id`='$raceId' 
+                          ORDER by racedist ASC";
+        $distances = $mysqli->query($qDistance);
+
+        while ($distance = $distances->fetch_object()) {
+            $query = "SELECT * FROM `tbl_hist_results` WHERE `horse_id`='$horseID' AND `race_id`='$raceId' AND `race_distance`='$distance->racedist'";
+            $get_horse = $mysqli->query($query);
+            $horse_id = array();
+            $distance = array();
+            $race_time = array();
+            $rank = array();
+            $horse_position = array();
+
+            while ($result = $get_horse->fetch_object()) {
+                $horse_id[] = $horseID;
+                $distance[] = $result->race_distance;
+                $race_time[] = $result->race_time;
+                $rank[] = $result->rank;
+                $horse_position[] = $result->horse_position;
+            }
+            $val = $race_time[0];
+            if($val == null)
+                continue;
+            $index = 0;
+            $n = count($race_time);
+
+            //getting min value for min time
+            for($i=1;$i<$n;$i++) {
+                if($val<$race_time[$i]) {
+                    $val = $val;
+                } else {
+                    $val = $race_time[$i];
+                    $index = $i;
+                }
+            }
+            $arr[] = $horse_id[$index].'#'.$distance[$index].'#'.$race_time[$index].'#'.$rank[$index].'#'.$horse_position[$index];
+        }
+
+        return $arr;
+    }
+
+
+
 }
