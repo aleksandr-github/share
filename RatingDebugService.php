@@ -273,6 +273,7 @@ class RatingDebugService
     {
         $steps = [];
         $infoArray = [];
+        
 
         // first step: UpdateHandicapForRaceTask
         $index = $this->arraySearchPartial($generateRankRawData, 'AlgorithmStrategyInterface::generateRank()', $entryNumber);
@@ -287,15 +288,19 @@ class RatingDebugService
             for($i=0;$i<$n;$i++) {
                 $distanceArray = explode("@", $rankArray[$i]);
                 $m = count($distanceArray);
+                $sum = 0;
                 for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[1];
                     $ee = $detailArray[2]."  ".$detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5];
+                    $sum = $sum + $detailArray[4];
                     $infoArray[] = $ee;
                 }
                 $steps[$i] = [
                     'RANK' => (object)[
-                        $dd => (object)$infoArray
+                        $dd => (object)$infoArray,
+                        "total" => $sum,
+                        "Average Rank" => $sum/$m
                     ],
                 ];
             }
