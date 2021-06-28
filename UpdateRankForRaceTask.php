@@ -91,6 +91,8 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                 $distance->racedist,
                 $mysqli
             );
+
+
             $cnt = count($numsArray);
 
             $horsesHistResult = $mysqli->query(
@@ -173,11 +175,9 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         $get_array = $mysqli->query("SELECT DISTINCT `horse_id` FROM `tbl_hist_results` WHERE `race_id`='$raceId' AND `race_distance`='$raceDistance'");
         $arr = array();
 
-        while ($arhorse = $get_array->fetch_object())
-        {
+        while ($arhorse = $get_array->fetch_object()) {
             $get_histar = $mysqli->query("SELECT MIN(handicap) as minihandi FROM `tbl_hist_results` WHERE `race_id`='$raceId' AND `race_distance`='$raceDistance' AND `horse_id`='$arhorse->horse_id'");
-            while ($ahandi = $get_histar->fetch_object())
-            {
+            while ($ahandi = $get_histar->fetch_object()) {
                 $arr[] = $ahandi->minihandi;
             }
         }
@@ -203,6 +203,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
     protected function getArrayOfRank($raceId, $horseID, $mysqli): array
     {
+        $arr = array();
         $qDistance = "SELECT DISTINCT CAST(race_distance AS UNSIGNED) AS racedist 
                           FROM tbl_hist_results 
                           WHERE `race_id`='$raceId' 
@@ -225,7 +226,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                 $rank[] = $result->rank;
                 $horse_position[] = $result->horse_position;
             }
-            $val = $race_time[0];
+            $val = reset($race_time);
             if($val == null)
                 continue;
             $index = 0;
