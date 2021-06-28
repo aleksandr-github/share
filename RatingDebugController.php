@@ -100,12 +100,44 @@ class RatingDebugController extends AbstractController
      */
     public function avgrank(int $horseId, int $raceId, int $histId, int $entryNumber): JsonResponse
     {
+        // todo move to service
+        if (!$this->supports($this->currentAlgorithm)) {
+            return new JsonResponse([
+                'code' => 501,
+                'message' => "Current algorithm not supported by " . __CLASS__,
+            ]);
+        }
+
+        $start = microtime(true);
+        $dbConnector = new DBConnector();
+        $historicResult = $dbConnector->getHistoricResult($histId);
+        $race = $dbConnector->getRaceDetails($raceId);
+        $horse = $dbConnector->getHorseDetails($horseId);
+
+        $file = APP_ROOT . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR . "debug_algorithm.log";
+        $contents = file_get_contents($file);
+
+        $handicapRawData = "generateHandicap();HORSE=".$historicResult->getHorseId().";RACE=".$historicResult->getRaceId().";RACE_DISTANCE=".$historicResult->getRaceDistance().";HORSE_POSITION=".$historicResult->getHorsePosition();
+        $generateHandicapRawData = $this->debugService->debugLogParse($handicapRawData, $contents);
+
+        $rankRawData = "generateRank();HORSE=".$historicResult->getHorseId().";RACE=".$historicResult->getRaceId().";RACE_DISTANCE=".$historicResult->getRaceDistance();
+        $generateRankRawData = $this->debugService->debugLogParse($rankRawData, $contents);
+
+        $avgSectionalRawData = "generateAVGSectional();HORSE=".$historicResult->getHorseId().";RACE=".$historicResult->getRaceId().";RACE_DISTANCE=".$historicResult->getRaceDistance();
+        $generateAVGSectionalRawData = $this->debugService->debugLogParse($avgSectionalRawData, $contents);
+
+        $h2hPointRawData = "AlgorithmStrategyInterface::getH2HPoint();HORSE=".$historicResult->getHorseId().";RACE=".$historicResult->getRaceId().";RACE_DISTANCE=".$historicResult->getRaceDistance().";HISTID=".$histId;
+        $getH2HPointRawData = $this->debugService->debugLogParse($h2hPointRawData, $contents);
+
+        $end = microtime(true) - $start;
         return new JsonResponse([
-            'models' => (object)[
-                'horse' => 1,
-                'race' => 1,
-                'historicResult' => 1,
-            ]
+            'steps' => $this->debugService->generateAvgRankSteps(
+                $generateHandicapRawData[0],
+                $generateRankRawData[0],
+                $generateAVGSectionalRawData[0],
+                $getH2HPointRawData[0],
+                $entryNumber
+            )
         ]);
     }
 

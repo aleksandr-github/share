@@ -254,6 +254,72 @@ class RatingDebugService
         return $steps;
     }
 
+
+
+    /**
+     * @param array $generateHandicapRawData
+     * @param array $generateRankRawData
+     * @param array $generateAVGSectionalRawData
+     * @param array $getH2HPointRawData
+     * @return array
+     */
+    public function generateAvgRankSteps(
+        array $generateHandicapRawData,
+        array $generateRankRawData,
+        array $generateAVGSectionalRawData,
+        array $getH2HPointRawData,
+        int $entryNumber
+    ): array
+    {
+        $steps = [];
+        $sumArray = [];
+
+        // first step: UpdateHandicapForRaceTask
+        $index = $this->arraySearchPartial($generateRankRawData, 'AlgorithmStrategyInterface::generateRank()', $entryNumber);
+        if ($index !== null) {
+            $stepVariables = $this->getVariablesFromDebugLog($generateRankRawData[$index]);
+
+            // helper section
+            $arrayOfHandicap = explode("@", $stepVariables->ARRAY_OF_HANDICAP);
+            $nameArrayOfHandicap = explode("@", $stepVariables->NAMEARRAY_OF_HANDICAP);
+            array_multisort($arrayOfHandicap, $nameArrayOfHandicap);
+            //array_unshift($arrayOfHandicap, $stepVariables->MIN_HANDICAP + 1);
+            $keys = array_keys($arrayOfHandicap, $stepVariables->MIN_HANDICAP);
+            $sumArray = array_map(function ($x, $y) { return $x.'   '.$y; }, $arrayOfHandicap, $nameArrayOfHandicap);
+
+            $ratingTempLine = sprintf(
+                '%s / %s / 2 = %s',
+                array_sum($keys),
+                count($keys),
+                $stepVariables->RANK
+            );
+            $steps['f(`rank`)'] = [
+                'result' => $stepVariables->RANK,
+                'formula' => 'array_sum(array_keys(ARRAY_OF_HANDICAP, MIN(handicap))) / count(array_keys(ARRAY_OF_HANDICAP, MIN(handicap)) = rank',
+                'calculation' => $ratingTempLine,
+                'subCalculations' => (object)[
+                    'ARRAY_OF_HANDICAP' => (object)$sumArray,
+                    'array_keys(ARRAY_OF_HANDICAP, MIN(handicap))' => (object)$keys,
+                    'array_sum(@arrayKeys)' => array_sum($keys),
+                    'count(@arrayKeys)' => count($keys),
+                    'MIN(handicap)' => $stepVariables->MIN_HANDICAP
+                ],
+                'subFormulas' => (object)[
+                    'ARRAY_OF_HANDICAP' => '@see UpdateHandicapForRaceTask::getArrayOfHandicap()',
+                    'MIN(handicap)' => '@see UpdateHandicapForRaceTask::updateRankSectionForRace()::$handicapResults'
+                ],
+                'emitter' => UpdateRatingForRaceTask::class
+            ];
+        }
+
+
+
+
+
+        return $steps;
+
+    }
+
     private function arraySearchPartial(array $arr, string $keyword, $entryNumber)
     {
         foreach($arr as $index => $string) {
