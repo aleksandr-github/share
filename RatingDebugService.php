@@ -284,10 +284,10 @@ class RatingDebugService
 
             $n = count($rankArray);
 
-            for($i=1;$i<$n;$i++) {
+            for($i=0;$i<$n;$i++) {
                 $distanceArray = explode("@", $rankArray[$i]);
                 $m = count($distanceArray);
-                for($j=1;$j<$m;$j++) {
+                for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[1];
                     $ee = $detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5];
