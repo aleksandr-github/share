@@ -89,6 +89,27 @@ class RatingDebugController extends AbstractController
         ]);
     }
 
+
+    /**
+     * @Route("/debug/rating/horse/{horseId}/race/{raceId}/historic_record/{histId}/avgrank/{entryNumber?0}", name="debug_rating")
+     *
+     * @param int $horseId
+     * @param int $raceId
+     * @param int $histId
+     * @return JsonResponse
+     */
+    public function avgrank(int $horseId, int $raceId, int $histId, int $entryNumber): JsonResponse
+    {
+        return new JsonResponse([
+            'models' => (object)[
+                'horse' => 1,
+                'race' => 1,
+                'historicResult' => 1,
+            ]
+        ]);
+    }
+
+
     // todo move to service and add interface
     private function supports(AlgorithmStrategyInterface $algorithm): bool
     {
