@@ -280,44 +280,21 @@ class RatingDebugService
             $stepVariables = $this->getVariablesFromDebugLog($generateRankRawData[$index]);
 
             // helper section
-            $arrayOfHandicap = explode("@", $stepVariables->ARRAY_OF_HANDICAP);
-            $nameArrayOfHandicap = explode("@", $stepVariables->NAMEARRAY_OF_HANDICAP);
-            array_multisort($arrayOfHandicap, $nameArrayOfHandicap);
-            //array_unshift($arrayOfHandicap, $stepVariables->MIN_HANDICAP + 1);
-            $keys = array_keys($arrayOfHandicap, $stepVariables->MIN_HANDICAP);
-            $sumArray = array_map(function ($x, $y) { return $x.'   '.$y; }, $arrayOfHandicap, $nameArrayOfHandicap);
+            $rankArray = explode("&", $stepVariables->CALCULATION_OF_AVERAGE_RANK);
 
-            $ratingTempLine = sprintf(
-                '%s / %s / 2 = %s',
-                array_sum($keys),
-                count($keys),
-                $stepVariables->RANK
-            );
-            $steps['f(`rank`)'] = [
-                'result' => $stepVariables->RANK,
-                'formula' => 'array_sum(array_keys(ARRAY_OF_HANDICAP, MIN(handicap))) / count(array_keys(ARRAY_OF_HANDICAP, MIN(handicap)) = rank',
-                'calculation' => $ratingTempLine,
-                'subCalculations' => (object)[
-                    'ARRAY_OF_HANDICAP' => (object)$sumArray,
-                    'array_keys(ARRAY_OF_HANDICAP, MIN(handicap))' => (object)$keys,
-                    'array_sum(@arrayKeys)' => array_sum($keys),
-                    'count(@arrayKeys)' => count($keys),
-                    'MIN(handicap)' => $stepVariables->MIN_HANDICAP
-                ],
-                'subFormulas' => (object)[
-                    'ARRAY_OF_HANDICAP' => '@see UpdateHandicapForRaceTask::getArrayOfHandicap()',
-                    'MIN(handicap)' => '@see UpdateHandicapForRaceTask::updateRankSectionForRace()::$handicapResults'
-                ],
-                'emitter' => UpdateRatingForRaceTask::class
-            ];
+            $n = count($rankArray);
+
+            for($i=1;$i<$n;$i++) {
+                $steps[$i] = [
+                    'RANK' => (object)[
+                        'ARRAY_OF_HANDICAP' => (object)$rankArray[$i]
+                    ],
+                ];
+            }
+
         }
 
-
-
-
-
         return $steps;
-
     }
 
     private function arraySearchPartial(array $arr, string $keyword, $entryNumber)
