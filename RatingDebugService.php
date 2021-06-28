@@ -290,7 +290,7 @@ class RatingDebugService
                 for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[1];
-                    $ee = $detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5];
+                    $ee = $detailArray[2]."  ".$detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5];
                     $infoArray[] = $ee;
                 }
                 $steps[$i] = [
