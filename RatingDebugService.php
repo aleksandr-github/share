@@ -284,11 +284,11 @@ class RatingDebugService
             $rankArray = explode("&", $stepVariables->CALCULATION_OF_AVERAGE_RANK);
 
             $n = count($rankArray);
-
+            $sum = 0;
             for($i=0;$i<$n;$i++) {
                 $distanceArray = explode("@", $rankArray[$i]);
                 $m = count($distanceArray);
-                $sum = 0;
+
                 for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[1];
@@ -300,6 +300,8 @@ class RatingDebugService
                     'RANK' => (object)[
                         $dd => (object)$infoArray,
                         "total" => $sum,
+                        "horse count" => $n,
+                        "distance count" => $m,
                         "Average Rank" => $sum/$m
                     ],
                 ];
