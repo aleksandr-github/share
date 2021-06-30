@@ -80,7 +80,12 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                           ORDER by racedist ASC";
         $distances = $mysqli->query($qDistance);
 
+        $count = 0;
+
         while ($distance = $distances->fetch_object()) {
+            $count ++;
+            if($count == 2)
+                break;
             $numsArray = $this->getArrayOfHandicap(
                 $race->race_id,
                 $distance->racedist,
@@ -208,7 +213,9 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         $get_horse = $mysqli->query($query);
         if ($get_horse->num_rows > 0) {
             while ($result = $get_horse->fetch_object()) {
-                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->avgrank.'#'.$result->horse_position;
+                if($result->rank == 0)
+                    continue;
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
             }
         }
 
