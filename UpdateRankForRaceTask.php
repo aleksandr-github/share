@@ -206,24 +206,9 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         $arr = array();
         $query = "SELECT hist.*, hs.horse_name FROM `tbl_hist_results`  as hist INNER JOIN tbl_horses as hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID'";
         $get_horse = $mysqli->query($query);
-        $horse_id = array();
-        $horse_name = array();
-        $distance = array();
-        $race_time = array();
-        $rank = array();
-        $horse_position = array();
 
         while ($result = $get_horse->fetch_object()) {
-            if($result->race_distance == null)
-                continue;
-            $horse_id[] = $horseID;
-            $horse_name[] = $result->horse_name;
-            $distance[] = $result->race_distance;
-            $race_time[] = $result->race_time;
-            $rank[] = $result->rank;
-            $horse_position[] = $result->horse_position;
-
-            $arr[] = $horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
+            $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
         }
 
         return $arr;
