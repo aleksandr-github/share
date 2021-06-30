@@ -201,29 +201,49 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         return $arr;
     }
 
-    protected function getArrayOfRank($raceID, $horseID, $mysqli): array
+    protected function getArrayOfRank($raceId, $horseID, $mysqli): array
     {
         $arr = array();
-        $query = "SELECT hist.*, hs.horse_name FROM `tbl_hist_results`  as hist INNER JOIN tbl_horses as hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID'";
-        $get_horse = $mysqli->query($query);
-        $horse_id = array();
-        $horse_name = array();
-        $distance = array();
-        $race_time = array();
-        $rank = array();
-        $horse_position = array();
+        $qDistance = "SELECT DISTINCT CAST(race_distance AS UNSIGNED) AS racedist 
+                          FROM tbl_hist_results 
+                          WHERE `race_id`='$raceId' 
+                          ORDER by racedist ASC";
+        $distances = $mysqli->query($qDistance);
 
-        while ($result = $get_horse->fetch_object()) {
-            if($result->race_distance == null)
+        while ($distance = $distances->fetch_object()) {
+            $query = "SELECT hist.*, hs.horse_name FROM `tbl_hist_results` as hist INNER JOIN tbl_horses as hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND `race_id`='$raceId' AND `race_distance`='$distance->racedist'";
+            $get_horse = $mysqli->query($query);
+            $horse_id = array();
+            $horse_name = array();
+            $distance = array();
+            $race_time = array();
+            $rank = array();
+            $horse_position = array();
+
+            while ($result = $get_horse->fetch_object()) {
+                $horse_id[] = $horseID;
+                $horse_name[] = $result->horse_name;
+                $distance[] = $result->race_distance;
+                $race_time[] = $result->race_time;
+                $rank[] = $result->handicap;
+                $horse_position[] = $result->horse_position;
+            }
+            $val = reset($race_time);
+            if($val == null)
                 continue;
-            $horse_id[] = $horseID;
-            $horse_name[] = $result->horse_name;
-            $distance[] = $result->race_distance;
-            $race_time[] = $result->race_time;
-            $rank[] = $result->rank;
-            $horse_position[] = $result->horse_position;
+            $index = 0;
+            $n = count($race_time);
 
-            $arr[] = $horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
+            //getting min value for min time
+            for($i=1;$i<$n;$i++) {
+                if($val<$race_time[$i]) {
+                    $val = $val;
+                } else {
+                    $val = $race_time[$i];
+                    $index = $i;
+                }
+            }
+            $arr[] = $horse_id[$index].'#'.$horse_name[$index].'#'.$distance[$index].'#'.$race_time[$index].'#'.$rank[$index].'#'.$horse_position[$index];
         }
 
         return $arr;
