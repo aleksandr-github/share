@@ -91,7 +91,7 @@ class RatingDebugController extends AbstractController
 
 
     /**
-     * @Route("/debug/rating/horse/{horseId}/race/{raceId}/historic_record/{histId}/avgrank/{entryNumber?0}", name="debug_rating")
+     * @Route("/debug/rating/horse/{horseId}/race/{raceId}/historic_record/{histId}/avgrank/{entryNumber?0}", name="debug_avgrank")
      *
      * @param int $horseId
      * @param int $raceId
@@ -131,6 +131,7 @@ class RatingDebugController extends AbstractController
 
         $end = microtime(true) - $start;
         return new JsonResponse([
+            'calculation' => 'sum(rank)/distance count',
             'steps' => $this->debugService->generateAvgRankSteps(
                 $generateHandicapRawData[0],
                 $generateRankRawData[0],

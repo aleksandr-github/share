@@ -288,8 +288,8 @@ class RatingDebugService
             for($i=0;$i<$n;$i++) {
                 $distanceArray = explode("@", $rankArray[$i]);
                 $m = count($distanceArray);
+
                 $infoArray = [];
-                $sum = 0;  
                 for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[2];
