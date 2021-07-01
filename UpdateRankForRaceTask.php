@@ -208,7 +208,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         $get_horse = $mysqli->query($query);
         if ($get_horse->num_rows > 0) {
             while ($result = $get_horse->fetch_object()) {
-                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->cal_rank.'#'.$result->horse_position;
             }
         }
 
