@@ -60,17 +60,15 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
         //getting rank array from hist_table
         $horseQuery = "SELECT horse_id  FROM `tbl_hist_results` GROUP BY horse_id ORDER BY horse_id";
         $horseIDs = $mysqli->query($horseQuery);
-        $horseID = 799;
-        $raceID = 141;
-//        while ($horseID = $horseIDs->fetch_object()) {
+        while ($horseID = $horseIDs->fetch_object()) {
             $arrayRankByHorse = $this->getArrayOfRank(
-                $horseID,
-                $raceID,
+                $race->race_id,
+                $horseID->horse_id,
                 $mysqli
             );//For one horse
             $arrayRankByDistance = implode("@", $arrayRankByHorse);//by distance
             $arrayAvgRankByDistance[] = $arrayRankByDistance;
-//        }
+        }
 
         $arrayAvgRankByHorse = implode("&", array_filter($arrayAvgRankByDistance));//by horse
 
@@ -206,12 +204,11 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
         $arr = array();
-
         $query = "SELECT hist.*,  hs.horse_name FROM `tbl_hist_results` AS hist INNER JOIN tbl_horses AS hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID'";
         $get_horse = $mysqli->query($query);
         if ($get_horse->num_rows > 0) {
             while ($result = $get_horse->fetch_object()) {
-                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->rank1;
             }
         }
 
