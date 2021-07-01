@@ -204,12 +204,13 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
         $arr = array();
-        $query = "SELECT hist.*,  hs.horse_name FROM `tbl_hist_results` AS hist INNER JOIN tbl_horses AS hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID'";
+        $horseID = 799;
+        $raceID = 141;
+        $query = "SELECT hist.*,  hs.horse_name FROM `tbl_hist_results` AS hist INNER JOIN tbl_horses AS hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID' limit 1";
         $get_horse = $mysqli->query($query);
         if ($get_horse->num_rows > 0) {
             while ($result = $get_horse->fetch_object()) {
-                $rank = sprintf("%f", $result->rank);
-                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$rank.'#'.$result->handicap.'#'.$result->horse_position;
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->rank.'#'.$result->horse_position;
             }
         }
 
