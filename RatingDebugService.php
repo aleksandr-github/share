@@ -290,20 +290,24 @@ class RatingDebugService
                 $m = count($distanceArray);
 
                 $infoArray = [];
+                $strSum = "";
                 for($j=0;$j<$m;$j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
                     $dd = $detailArray[2];
                     $ee = $detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5]."  ".$detailArray[6];
                     $sum = $sum + $detailArray[5];
+                    $strSum = ($j == 0)? $detailArray[5]:($strSum."+".$detailArray[5]);
                     $infoArray[] = $ee;
                 }
+                $strTotal = $strSum.'='.$sum;
+                $avgRank = $sum/$m;
                 $steps[$i] = [
                     'RANK' => (object)[
                         $dd => (object)$infoArray,
-                        "total" => $sum,
+                        "total" => $strTotal,
                         "horse count" => $n,
                         "distance count" => $m,
-                        "Average Rank" => $sum/$m
+                        "Average Rank" => $sum.'/'.$m.'='.$avgRank
                     ],
                 ];
             }
