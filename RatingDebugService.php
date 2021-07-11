@@ -293,6 +293,7 @@ class RatingDebugService
                 $m = count($distanceArray);
 //                $infoArray = [];
                 $realArray = [];
+                $objArray = [];
                 $sum = 0;
                 $horseArray = array();
                 $distanceTempArray = array();
@@ -302,7 +303,7 @@ class RatingDebugService
                     $dd = $detailArray[2];
                     //distance, race time, calc rank, horse position
                     $ee = $detailArray[3] . "  " . $detailArray[4] . "  " . $detailArray[5] . "  " . $detailArray[6];
-                    $sum = $sum + $detailArray[5];
+                    //$sum = $sum + $detailArray[5];
 //                    $infoArray[] = $ee;
                     $distanceTempArray[] = $detailArray[3];
                     $horseArray[] = array("raceID" => $detailArray[0], "horseID" => $detailArray[1], "horseName" => $detailArray[2], "distance" => $detailArray[3], "raceTime" => $detailArray[4], "rank" => $detailArray[5], "horsePosition" => $detailArray[6]);
@@ -326,8 +327,10 @@ class RatingDebugService
                     for ($k = 0; $k < count($tmp); $k++) {
                         $realArray[] = array("raceID" => $tmp[$k]['raceID'], "horseID" => $tmp[$k]['horseID'], "horseName" => $tmp[$k]['horseName'], "distance" => $tmp[$k]['distance'], "raceTime" => $tmp[$k]['raceTime'], "rank" => $tmp[$k]['rank'], "horsePosition" => $tmp[$k]['horsePosition']);
                         $objArray[] = $tmp[$k]['distance']."  ".$tmp[$k]['raceTime']."  ".$tmp[$k]['rank']."  ".$tmp[$k]['horsePosition'];
+                        $sum = $sum + $tmp[$k]['rank'];
                     }
                 }
+                $m = count($objArray);
                 $steps[$i] = [
                     'RANK' => (object)[
                         $dd => (object)$objArray,
