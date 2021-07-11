@@ -203,12 +203,29 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
+        $query = "SELECT count(*) FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
+        //total horse count
+        $horsesCount = $mysqli->query($query)->num_rows;
         $arr = array();
         $query = "SELECT hist.*,  hs.horse_name FROM `tbl_hist_results` AS hist INNER JOIN tbl_horses AS hs ON hs.horse_id=hist.horse_id WHERE hist.horse_id='$horseID' AND hist.race_id='$raceID'";
         $get_horse = $mysqli->query($query);
         if ($get_horse->num_rows > 0) {
             while ($result = $get_horse->fetch_object()) {
-                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$result->cal_rank.'#'.$result->horse_position;
+                //horse array count per race id and distance
+                $numsArray = $this->getArrayOfHandicap($raceID, $result->race_distance, $mysqli);
+                $cnt = count($numsArray);
+                $rank = 0;
+                if ($horsesCount > 0) {
+                    $per = ($cnt / $horsesCount) * 100;
+
+                    if ($per > $this->positionPercentage) {
+                        $rank = $result->cal_rank;
+                    }
+                    else{
+                        $rank = 0;
+                    }
+                }
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$rank.'#'.$result->horse_position;
             }
         }
 
