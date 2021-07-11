@@ -327,7 +327,7 @@ class RatingDebugService
                     for ($k = 0; $k < count($tmp); $k++) {
                         $realArray[] = array("raceID" => $tmp[$k]['raceID'], "horseID" => $tmp[$k]['horseID'], "horseName" => $tmp[$k]['horseName'], "distance" => $tmp[$k]['distance'], "raceTime" => $tmp[$k]['raceTime'], "rank" => $tmp[$k]['rank'], "horsePosition" => $tmp[$k]['horsePosition']);
                         $objArray[] = $tmp[$k]['distance']."  ".$tmp[$k]['raceTime']."  ".$tmp[$k]['rank']."  ".$tmp[$k]['horsePosition'];
-                        $strSum = ($k == 0)? $tmp[$k]['rank']:($strSum."+".$tmp[$k]['rank']);
+                        $strSum = ($strSum == "")? $tmp[$k]['rank']:($strSum."+".$tmp[$k]['rank']);
                         $sum = $sum + $tmp[$k]['rank'];
                     }
                 }
