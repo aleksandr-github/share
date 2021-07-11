@@ -325,11 +325,12 @@ class RatingDebugService
                     $tmp = array_slice($calcArray, 0, $selector);
                     for ($k = 0; $k < count($tmp); $k++) {
                         $realArray[] = array("raceID" => $tmp[$k]['raceID'], "horseID" => $tmp[$k]['horseID'], "horseName" => $tmp[$k]['horseName'], "distance" => $tmp[$k]['distance'], "raceTime" => $tmp[$k]['raceTime'], "rank" => $tmp[$k]['rank'], "horsePosition" => $tmp[$k]['horsePosition']);
+                        $objArray[] = $tmp[$k]['distance']."  ".$tmp[$k]['raceTime']."  ".$tmp[$k]['rank']."  ".$tmp[$k]['horsePosition'];
                     }
                 }
                 $steps[$i] = [
                     'RANK' => (object)[
-                        $dd => (object)$realArray,
+                        $dd => (object)$objArray,
                         "total" => $sum,
                         "horse count" => $cnt,
                         "distance count" => $m,
