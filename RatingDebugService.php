@@ -273,7 +273,7 @@ class RatingDebugService
     {
         $steps = [];
         $infoArray = [];
-        
+
 
         // first step: UpdateHandicapForRaceTask
         $index = $this->arraySearchPartial($generateRankRawData, 'AlgorithmStrategyInterface::generateRank()', $entryNumber);
@@ -284,37 +284,71 @@ class RatingDebugService
             $rankArray = explode("&", $stepVariables->CALCULATION_OF_AVERAGE_RANK);
 
             $n = count($rankArray);
+            $cnt = count($rankArray);
             $sum = 0;
-            for($i=0;$i<$n;$i++) {
+            $selector = $_ENV['selector'];
+
+            for ($i = 0; $i < $n; $i++) {
                 $distanceArray = explode("@", $rankArray[$i]);
                 $m = count($distanceArray);
-
-                $infoArray = [];
-                $strSum = "";
-                for($j=0;$j<$m;$j++) {
+//                $infoArray = [];
+                $realArray = [];
+                $sum = 0;
+                $horseArray = array();
+                $distanceTempArray = array();
+                for ($j = 0; $j < $m; $j++) {
                     $detailArray = explode("#", $distanceArray[$j]);
+                    //horse name
                     $dd = $detailArray[2];
-                    $ee = $detailArray[3]."  ".$detailArray[4]."  ".$detailArray[5]."  ".$detailArray[6];
+                    //distance, race time, calc rank, horse position
+                    $ee = $detailArray[3] . "  " . $detailArray[4] . "  " . $detailArray[5] . "  " . $detailArray[6];
                     $sum = $sum + $detailArray[5];
-                    $strSum = ($j == 0)? $detailArray[5]:($strSum."+".$detailArray[5]);
-                    $infoArray[] = $ee;
+//                    $infoArray[] = $ee;
+                    $distanceTempArray[] = $detailArray[3];
+                    $horseArray[] = array("raceID" => $detailArray[0], "horseID" => $detailArray[1], "horseName" => $detailArray[2], "distance" => $detailArray[3], "raceTime" => $detailArray[4], "rank" => $detailArray[5], "horsePosition" => $detailArray[6]);
                 }
-                $strTotal = $strSum.'='.$sum;
-                $avgRank = $sum/$m;
+                //remove duplicate element from $distanceTempArray
+                $distanceTempArray = array_unique($distanceTempArray);
+
+
+                foreach ($distanceTempArray as $distance) {//distance array loop
+                    $calcArray = array();
+                    foreach ($horseArray as $key => $horse) {//all array loop
+                        if ($horse["distance"] == $distance) {
+                            $calcArray[] = array("raceID" => $horse['raceID'], "horseID" => $horse['horseID'], "horseName" => $horse['horseName'], "distance" => $horse['distance'], "raceTime" => $horse['raceTime'], "rank" => $horse['rank'], "horsePosition" => $horse['horsePosition']);
+                        }
+                    }
+
+                    //calculate rank per distance
+                    array_sort_by_column($calcArray, 'distance');
+                    $tmp = array();
+                    $tmp = array_slice($calcArray, 0, $selector);
+                    for ($k = 0; $k < count($tmp); $k++) {
+                        $realArray[] = array("raceID" => $tmp[$k]['raceID'], "horseID" => $tmp[$k]['horseID'], "horseName" => $tmp[$k]['horseName'], "distance" => $tmp[$k]['distance'], "raceTime" => $tmp[$k]['raceTime'], "rank" => $tmp[$k]['rank'], "horsePosition" => $tmp[$k]['horsePosition']);
+                    }
+                }
                 $steps[$i] = [
                     'RANK' => (object)[
-                        $dd => (object)$infoArray,
-                        "total" => $strTotal,
-                        "horse count" => $n,
+                        $dd => (object)$realArray,
+                        "total" => $sum,
+                        "horse count" => $cnt,
                         "distance count" => $m,
-                        "Average Rank" => $sum.'/'.$m.'='.$avgRank
+                        "Average Rank" => $sum / $m
                     ],
                 ];
             }
 
+            return $steps;
+        }
+    }
+
+    function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+        $sort_col = array();
+        foreach ($arr as $key => $row) {
+            $sort_col[$key] = $row[$col];
         }
 
-        return $steps;
+        array_multisort($sort_col, $dir, $arr);
     }
 
     private function arraySearchPartial(array $arr, string $keyword, $entryNumber)
