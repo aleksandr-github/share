@@ -134,6 +134,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
                                 $this->debugLogger->varLog([
                                     'ACTION' => "AlgorithmStrategyInterface::generateRank()",
+                                    'positionPercentage' => $_ENV['positionPercentage'],
                                     'HORSE' => $horse->horse_id,
                                     'RACE' => $race->race_id,
                                     'RACE_DISTANCE' => $distance->racedist,
