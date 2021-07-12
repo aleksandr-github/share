@@ -203,6 +203,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
+        $positionPercentage = $_ENV['positionPercentage'];
         $query = "SELECT count(*) FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
         //total horse count
         $horsesCount = $mysqli->query($query)->num_rows;
@@ -218,7 +219,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                 if ($horsesCount > 0) {
                     $per = ($cnt / $horsesCount) * 100;
 
-                    if ($per > $this->positionPercentage) {
+                    if ($per > $positionPercentage) {
                         $rank = $result->cal_rank;
                     }
                     else{
