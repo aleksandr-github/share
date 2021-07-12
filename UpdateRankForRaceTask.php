@@ -203,7 +203,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
-        $query = "SELECT count(*) FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
+        $query = "SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
         //total horse count
         $horsesCount = $mysqli->query($query)->num_rows;
         $arr = array();
