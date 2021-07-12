@@ -342,10 +342,9 @@ class RatingDebugService
                         "Average Rank" => $sum.'/'.$m.'='.($sum / $m)
                     ],
                 ];
-            }
-
-            return $steps;
+            }        
         }
+            return $steps;
     }
 
     private function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
