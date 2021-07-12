@@ -134,7 +134,6 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
                                 $this->debugLogger->varLog([
                                     'ACTION' => "AlgorithmStrategyInterface::generateRank()",
-                                    'positionPercentage' => $_ENV['positionPercentage'],
                                     'HORSE' => $horse->horse_id,
                                     'RACE' => $race->race_id,
                                     'RACE_DISTANCE' => $distance->racedist,
@@ -204,8 +203,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
 
     protected function getArrayOfRank($raceID, $horseID, $mysqli): array
     {
-        $positionPercentage = $_ENV['positionPercentage'];
-        $query = "SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
+        $query = "SELECT count(*) FROM `tbl_temp_hraces` WHERE `race_id`='$raceID' AND `horse_fxodds`!='0'";
         //total horse count
         $horsesCount = $mysqli->query($query)->num_rows;
         $arr = array();
@@ -220,7 +218,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                 if ($horsesCount > 0) {
                     $per = ($cnt / $horsesCount) * 100;
 
-                    if ($per > $positionPercentage) {
+                    if ($per > $this->positionPercentage) {
                         $rank = $result->cal_rank;
                     }
                     else{
