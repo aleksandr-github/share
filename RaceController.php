@@ -103,6 +103,7 @@ class RaceController extends AbstractController
         $horseRatingData = $this->generateHorseRatingData(false);
         $horseData = $this->generateHorseData($horseRatingData, false, $resultsForRaceArray);
         $mainPageData = $this->strippedMainPageRecords($race, $horseData);
+        $selector = $_ENV['selector'];
 
         // normal calculations
         $getrnum = $mysqli->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$race'");
@@ -119,6 +120,14 @@ class RaceController extends AbstractController
                 // default view
                 $resultsCombinedArray = $this->generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $horseDetails, $resultsCombinedArray, $horseRatingData, $mainPageData);
             }
+        }
+
+        if ($average !== "average") {
+            //calculate rank per distance
+            $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
+            $tmp = array();
+            $tmp = array_slice($resultsCombinedArray, 0, $selector);
+            $resultsCombinedArray = $tmp;
         }
         // TODO END REFACTOR
 
@@ -439,5 +448,15 @@ FROM tbl_hist_results hr INNER JOIN tbl_horses h ON hr.horse_id = h.horse_id WHE
         }
 
         return 0;
+    }
+
+    /* sort by col  */
+    private function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+        $sort_col = array();
+        foreach ($arr as $key => $row) {
+            $sort_col[$key] = $row[$col];
+        }
+
+        array_multisort($sort_col, $dir, $arr);
     }
 }
