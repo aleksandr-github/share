@@ -115,6 +115,10 @@ class RaceController extends AbstractController
             // IF averages is not set
             if ($average !== "average") {
                 $resultsCombinedArray = $this->generateTableRowsForHistoricResults($race, $ghorse, $horseDetails, $resultsCombinedArray);
+                $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
+                $tmp = array();
+                $tmp = array_slice($resultsCombinedArray, 0, $selector);
+                $resultsCombinedArray = $tmp;
             // IF AVERAGES IS SET!!!! (avg=1)
             } else {
                 // default view
@@ -122,13 +126,6 @@ class RaceController extends AbstractController
             }
         }
 
-        if ($average !== "average") {
-            //calculate rank per distance
-            $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
-            $tmp = array();
-            $tmp = array_slice($resultsCombinedArray, 0, $selector);
-            $resultsCombinedArray = $tmp;
-        }
         // TODO END REFACTOR
 
         return $this->render('race.html.twig', [
