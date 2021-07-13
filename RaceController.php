@@ -182,7 +182,8 @@ class RaceController extends AbstractController
         $distanceDetails = $this->dbConnector->getDistanceArray($raceId);
         $mysqli = $this->dbConnector->getDbConnection();
         foreach ($distanceDetails as $distance) {
-            $sqlnow = $mysqli->query("SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='$ghorse->horse_id' AND `race_distance`='$distance'");
+            $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."' AND `race_distance`='".$distance."'";
+            $sqlnow = $mysqli->query($query);
             if ($sqlnow->num_rows > 0) {
                 while ($resnow = $sqlnow->fetch_object()) {
                     $resultsCombinedArray[] = [
