@@ -22,6 +22,8 @@ class RaceController extends AbstractController
     protected $dbConnector;
     protected $session;
     protected $ratingFieldResultSetService;
+    protected $selector;
+
 
     /**
      * @throws Exception
@@ -33,6 +35,7 @@ class RaceController extends AbstractController
         $this->dbConnector = new DBConnector();
         $this->session = $session;
         $this->ratingFieldResultSetService = $ratingFieldResultSetService;
+        $this->selector = $_ENV['selector'];
     }
 
     /**
@@ -103,7 +106,6 @@ class RaceController extends AbstractController
         $horseRatingData = $this->generateHorseRatingData(false);
         $horseData = $this->generateHorseData($horseRatingData, false, $resultsForRaceArray);
         $mainPageData = $this->strippedMainPageRecords($race, $horseData);
-        $selector = $_ENV['selector'];
 
         // normal calculations
         $getrnum = $mysqli->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$race'");
@@ -115,10 +117,7 @@ class RaceController extends AbstractController
             // IF averages is not set
             if ($average !== "average") {
                 $resultsCombinedArray = $this->generateTableRowsForHistoricResults($race, $ghorse, $horseDetails, $resultsCombinedArray);
-                $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
-                $tmp = array();
-                $tmp = array_slice($resultsCombinedArray, 0, $selector);
-                $resultsCombinedArray = $tmp;
+
             // IF AVERAGES IS SET!!!! (avg=1)
             } else {
                 // default view
@@ -180,52 +179,60 @@ class RaceController extends AbstractController
      */
     protected function generateTableRowsForHistoricResults(int $raceId, $ghorse, Horse $horseDetails, array $resultsCombinedArray): array
     {
+        $distanceDetails = $this->dbConnector->getDistanceArray($raceId);
         $mysqli = $this->dbConnector->getDbConnection();
-        $sqlnow = $mysqli->query("SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='$ghorse->horse_id'");
-        if ($sqlnow->num_rows > 0) {
-            while ($resnow = $sqlnow->fetch_object()) {
+        foreach ($distanceDetails as $distance) {
+            $sqlnow = $mysqli->query("SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='$ghorse->horse_id' AND `race_distance`='$distance'");
+            if ($sqlnow->num_rows > 0) {
+                while ($resnow = $sqlnow->fetch_object()) {
+                    $resultsCombinedArray[] = [
+                        'horseNum' => $ghorse->horse_num,
+                        'horseName' => $horseDetails->getHorseName(),
+                        'horseLatestResults' => $horseDetails->getHorseLatestResults(),
+                        'horseFxOdds' => $resnow->horse_fixed_odds,
+                        'raceDistance' => $resnow->race_distance,
+                        'raceSectional' => $resnow->sectional,
+                        'raceTime' => $resnow->race_time,
+                        'raceHorsePosition' => $resnow->horse_position,
+                        'raceHorseLength' => $resnow->length,
+                        'raceWeight' => $resnow->horse_weight,
+                        'horseWeight' => $ghorse->horse_weight,
+                        'handicap' => number_format($resnow->handicap, 3),
+                        'rating' => $resnow->rating,
+                        'rank' => $resnow->rank,
+                        'raceId' => $raceId,
+                        'horseId' => $horseDetails->getHorseId(),
+                        'histId' => $resnow->hist_id
+                    ];
+                }
+            } else {
+                // Horse seems to not have historic results
                 $resultsCombinedArray[] = [
                     'horseNum' => $ghorse->horse_num,
                     'horseName' => $horseDetails->getHorseName(),
                     'horseLatestResults' => $horseDetails->getHorseLatestResults(),
-                    'horseFxOdds' => $resnow->horse_fixed_odds,
-                    'raceDistance' => $resnow->race_distance,
-                    'raceSectional' => $resnow->sectional,
-                    'raceTime' => $resnow->race_time,
-                    'raceHorsePosition' => $resnow->horse_position,
-                    'raceHorseLength' => $resnow->length,
-		    'raceWeight' => $resnow->horse_weight,
-                    'horseWeight' => $ghorse->horse_weight,
-                    'handicap' => number_format($resnow->handicap, 3),
-                    'rating' => $resnow->rating,
-                    'rank' => $resnow->rank,
+                    'horseFxOdds' => $ghorse->horse_fxodds,
+                    'raceDistance' => null,
+                    'raceSectional' => null,
+                    'raceTime' => null,
+                    'raceHorsePosition' => null,
+                    'raceWeight' => null,
+                    'raceWeight' => null,
+                    'horseWeight' => null,
+                    'handicap' => null,
+                    'rating' => null,
+                    'rank' => null,
                     'raceId' => $raceId,
                     'horseId' => $horseDetails->getHorseId(),
-                    'histId' => $resnow->hist_id
+                    'histId' => null
                 ];
             }
-        } else {
-            // Horse seems to not have historic results
-            $resultsCombinedArray[] = [
-                'horseNum' => $ghorse->horse_num,
-                'horseName' => $horseDetails->getHorseName(),
-                'horseLatestResults' => $horseDetails->getHorseLatestResults(),
-                'horseFxOdds' => $ghorse->horse_fxodds,
-                'raceDistance' => null,
-                'raceSectional' => null,
-                'raceTime' => null,
-                'raceHorsePosition' => null,
-                'raceWeight' => null,
-                'raceWeight' => null,
-                'horseWeight' => null,
-                'handicap' => null,
-                'rating' => null,
-                'rank' => null,
-                'raceId' => $raceId,
-                'horseId' => $horseDetails->getHorseId(),
-                'histId' => null
-            ];
+            $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
+            $tmp = array();
+            $tmp = array_slice($resultsCombinedArray, 0, $this->selector);
+            $resultsCombinedArray = $tmp;
         }
+
         return $resultsCombinedArray;
     }
 
