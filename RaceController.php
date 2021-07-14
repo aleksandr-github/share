@@ -218,7 +218,6 @@ class RaceController extends AbstractController
                     'raceTime' => null,
                     'raceHorsePosition' => null,
                     'raceWeight' => null,
-                    'raceWeight' => null,
                     'horseWeight' => null,
                     'handicap' => null,
                     'rating' => null,
