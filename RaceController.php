@@ -182,52 +182,108 @@ class RaceController extends AbstractController
         $distanceArray = $this->dbConnector->getDistanceArray($raceId);
         $horseIDArray = $this->dbConnector->getHorseIDArray($raceId);
         $mysqli = $this->dbConnector->getDbConnection();
-            $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."'";
-            $sqlnow = $mysqli->query($query);
-            if ($sqlnow->num_rows > 0) {
-                while ($resnow = $sqlnow->fetch_object()) {
-                    $resultsCombinedArray[] = [
-                        'horseNum' => $ghorse->horse_num,
-                        'horseName' => $horseDetails->getHorseName(),
-                        'horseLatestResults' => $horseDetails->getHorseLatestResults(),
-                        'horseFxOdds' => $resnow->horse_fixed_odds,
-                        'raceDistance' => $resnow->race_distance,
-                        'raceSectional' => $resnow->sectional,
-                        'raceTime' => $resnow->race_time,
-                        'raceHorsePosition' => $resnow->horse_position,
-                        'raceHorseLength' => $resnow->length,
-                        'raceWeight' => $resnow->horse_weight,
-                        'horseWeight' => $ghorse->horse_weight,
-                        'handicap' => number_format($resnow->handicap, 3),
-                        'rating' => $resnow->rating,
-                        'rank' => $resnow->rank,
-                        'raceId' => $raceId,
-                        'horseId' => $horseDetails->getHorseId(),
-                        'histId' => $resnow->hist_id
-                    ];
-                }
-            } else {
-                // Horse seems to not have historic results
-                $resultsCombinedArray[] = [
+        $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."'";
+        $sqlnow = $mysqli->query($query);
+        $tmp = array();
+        if ($sqlnow->num_rows > 0) {
+            while ($resnow = $sqlnow->fetch_object()) {
+                $tmp[] = [
                     'horseNum' => $ghorse->horse_num,
                     'horseName' => $horseDetails->getHorseName(),
                     'horseLatestResults' => $horseDetails->getHorseLatestResults(),
-                    'horseFxOdds' => $ghorse->horse_fxodds,
-                    'raceDistance' => null,
-                    'raceSectional' => null,
-                    'raceTime' => null,
-                    'raceHorsePosition' => null,
-                    'raceHorseLength' => null,
-                    'raceWeight' => null,
-                    'horseWeight' => null,
-                    'handicap' => null,
-                    'rating' => null,
-                    'rank' => null,
+                    'horseFxOdds' => $resnow->horse_fixed_odds,
+                    'raceDistance' => $resnow->race_distance,
+                    'raceSectional' => $resnow->sectional,
+                    'raceTime' => $resnow->race_time,
+                    'raceHorsePosition' => $resnow->horse_position,
+                    'raceHorseLength' => $resnow->length,
+                    'raceWeight' => $resnow->horse_weight,
+                    'horseWeight' => $ghorse->horse_weight,
+                    'handicap' => number_format($resnow->handicap, 3),
+                    'rating' => $resnow->rating,
+                    'rank' => $resnow->rank,
                     'raceId' => $raceId,
                     'horseId' => $horseDetails->getHorseId(),
-                    'histId' => null
+                    'histId' => $resnow->hist_id
                 ];
             }
+        } else {
+            // Horse seems to not have historic results
+            $tmp[] = [
+                'horseNum' => $ghorse->horse_num,
+                'horseName' => $horseDetails->getHorseName(),
+                'horseLatestResults' => $horseDetails->getHorseLatestResults(),
+                'horseFxOdds' => $ghorse->horse_fxodds,
+                'raceDistance' => null,
+                'raceSectional' => null,
+                'raceTime' => null,
+                'raceHorsePosition' => null,
+                'raceHorseLength' => null,
+                'raceWeight' => null,
+                'horseWeight' => null,
+                'handicap' => null,
+                'rating' => null,
+                'rank' => null,
+                'raceId' => $raceId,
+                'horseId' => $horseDetails->getHorseId(),
+                'histId' => null
+            ];
+        }
+
+        foreach ($horseIDArray as $horseID) {
+            foreach ($distanceArray as $distance) {
+                $calcArray = array();
+                foreach ($tmp as $key => $horse) {
+                    if (($horseID == $horse["horseId"]) && ($distance == $horse["raceDistance"])) {
+                        $calcArray[] = [
+                            'horseNum' => $horse["horseNum"],
+                            'horseName' => $horse["horseName"],
+                            'horseLatestResults' => $horse["horseLatestResults"],
+                            'horseFxOdds' => $horse["horseFxOdds"],
+                            'raceDistance' => $horse["raceDistance"],
+                            'raceSectional' => $horse["raceSectional"],
+                            'raceTime' => $horse["raceTime"],
+                            'raceHorsePosition' => $horse["raceHorsePosition"],
+                            'raceHorseLength' => $horse["raceHorseLength"],
+                            'raceWeight' => $horse["raceWeight"],
+                            'horseWeight' => $horse["horseWeight"],
+                            'handicap' => $horse["handicap"],
+                            'rating' => $horse["rating"],
+                            'rank' => $horse["rank"],
+                            'raceId' => $horse["raceId"],
+                            'horseId' => $horse["horseId"],
+                            'histId' => $horse["histId"],
+                        ];
+                    }
+                }
+
+                $this->array_sort_by_column($calcArray, 'rank');
+                $tmp0 = array();
+                $tmp0 = array_slice($calcArray, 0, $this->selector);
+                for ($k = 0; $k < count($tmp0); $k++) {
+                    $resultsCombinedArray[] = array(
+                        "horseNum" => $tmp0[$k]['horseNum'],
+                        "horseName" => $tmp0[$k]['horseName'],
+                        "horseLatestResults" => $tmp0[$k]['horseLatestResults'],
+                        "horseFxOdds" => $tmp0[$k]['horseFxOdds'],
+                        "raceDistance" => $tmp0[$k]['raceDistance'],
+                        "raceSectional" => $tmp0[$k]['raceSectional'],
+                        "raceTime" => $tmp0[$k]['raceTime'],
+                        "raceHorsePosition" => $tmp0[$k]['raceHorsePosition'],
+                        "raceHorseLength" => $tmp0[$k]['raceHorseLength'],
+                        "raceWeight" => $tmp0[$k]['raceWeight'],
+                        "horseWeight" => $tmp0[$k]['horseWeight'],
+                        "handicap" => $tmp0[$k]['handicap'],
+                        "rating" => $tmp0[$k]['rating'],
+                        "rank" => $tmp0[$k]['rank'],
+                        "raceId" => $tmp0[$k]['raceId'],
+                        "horseId" => $tmp0[$k]['horseId'],
+                        "histId" => $tmp0[$k]['histId']
+                    );
+                }
+
+            }
+        }
 
         return $resultsCombinedArray;
     }
