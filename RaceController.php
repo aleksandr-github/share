@@ -359,6 +359,7 @@ class RaceController extends AbstractController
                     $sum = $sum + $tmp0[$k]['rank'];
                 }
             }
+            if($count != 0)
             $resultsAVGCombinedArray[] = array(
                 "horseId" => $horseID,
                 "AVG" => $sum/$count
@@ -400,7 +401,7 @@ class RaceController extends AbstractController
                         $averageRankForHorseInRace = 0;
                 }
 
-                $averageRankForHorseInRace = number_format($ratingData['rank'], 2);
+                //$averageRankForHorseInRace = number_format($ratingData['rank'], 2);
                 $odds = str_replace("$", "", $resavg->horse_fixed_odds);
                 $position = isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['position'] : '';
                 $resultsCombinedArray[] = [
