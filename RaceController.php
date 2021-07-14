@@ -282,10 +282,90 @@ class RaceController extends AbstractController
                     );
                 }
 
+
             }
         }
 
         return $resultsCombinedArray;
+    }
+
+    /**
+     * @param int $raceId
+     * @param $ghorse
+     * @param \App\Model\App\Horse $horseDetails
+     * @param array $resultsAVGCombinedArray
+     * @return array
+     */
+    protected function generateTableRowsForHistoricResultsAVGRANK(int $raceId, $ghorse, Horse $horseDetails, array $resultsAVGCombinedArray): array
+    {
+        $distanceArray = $this->dbConnector->getDistanceArray($raceId);
+        $horseIDArray = $this->dbConnector->getHorseIDArray($raceId);
+        $mysqli = $this->dbConnector->getDbConnection();
+        $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."'";
+        $sqlnow = $mysqli->query($query);
+        $tmp = array();
+        if ($sqlnow->num_rows > 0) {
+            while ($resnow = $sqlnow->fetch_object()) {
+                $tmp[] = [
+                    'horseNum' => $ghorse->horse_num,
+                    'horseName' => $horseDetails->getHorseName(),
+                    'raceDistance' => $resnow->race_distance,
+                    'raceHorsePosition' => $resnow->horse_position,
+                    'rank' => $resnow->rank,
+                    'raceId' => $raceId,
+                    'horseId' => $horseDetails->getHorseId(),
+                    'histId' => $resnow->hist_id
+                ];
+            }
+        } else {
+            // Horse seems to not have historic results
+            $tmp[] = [
+                'horseNum' => $ghorse->horse_num,
+                'horseName' => $horseDetails->getHorseName(),
+                'raceDistance' => null,
+                'raceHorsePosition' => null,
+                'rank' => null,
+                'raceId' => $raceId,
+                'horseId' => $horseDetails->getHorseId(),
+                'histId' => null
+            ];
+        }
+
+        foreach ($horseIDArray as $horseID) {
+            $sum = 0;
+            $count = 0;
+            foreach ($distanceArray as $distance) {
+                $calcArray = array();
+                foreach ($tmp as $key => $horse) {
+                    if (($horseID == $horse["horseId"]) && ($distance == $horse["raceDistance"])) {
+                        $calcArray[] = [
+                            'horseNum' => $horse["horseNum"],
+                            'horseName' => $horse["horseName"],
+                            'raceDistance' => $horse["raceDistance"],
+                            'raceHorsePosition' => $horse["raceHorsePosition"],
+                            'rank' => $horse["rank"],
+                            'raceId' => $horse["raceId"],
+                            'horseId' => $horse["horseId"],
+                            'histId' => $horse["histId"],
+                        ];
+                    }
+                }
+
+                $this->array_sort_by_column($calcArray, 'rank');
+                $tmp0 = array();
+                $tmp0 = array_slice($calcArray, 0, $this->selector);
+                for ($k = 0; $k < count($tmp0); $k++) {
+                    $count++;
+                    $sum = $sum + $tmp0[$k]['rank'];
+                }
+            }
+            $resultsAVGCombinedArray[] = array(
+                "horseId" => $horseID,
+                "AVG" => $sum/$count
+            );
+        }
+
+        return $resultsAVGCombinedArray;
     }
 
     /**
@@ -300,6 +380,7 @@ class RaceController extends AbstractController
      */
     protected function generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, Horse $horseDetails, array $resultsCombinedArray, array $horseRatingData, array $mainPageData): array
     {
+        $AVGRANK = [];
         $mysqli = $this->dbConnector->getDbConnection();
         $sqlfavg = "SELECT *, AVG(`rating`) as rat, AVG(`rank`) as avgrank FROM `tbl_hist_results` WHERE `race_id`='" . $race . "' AND `horse_id`='$ghorse->horse_id' GROUP BY `horse_id`";
 
@@ -310,6 +391,15 @@ class RaceController extends AbstractController
                 // This is average rating for horse in race
                 $ratingData = $horseRatingData[$horseDetails->getHorseId()][$race];
                 $averageRatingForHorseInRace = number_format($ratingData['rating'], 2);
+                $AVGRANK = $this->generateTableRowsForHistoricResultsAVGRANK($race, $ghorse, $horseDetails, $AVGRANK);
+                foreach ($AVGRANK as $key => $horse) {//all array loop
+                    if ($horse["horseId"] == $horseDetails->getHorseId()) {
+                        $averageRankForHorseInRace = number_format($horse['AVG'], 2);
+                    }
+                    else
+                        $averageRankForHorseInRace = 0;
+                }
+
                 $averageRankForHorseInRace = number_format($ratingData['rank'], 2);
                 $odds = str_replace("$", "", $resavg->horse_fixed_odds);
                 $position = isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['position'] : '';
