@@ -246,6 +246,18 @@ class DBConnector
         return $results;
     }
 
+    public function getHorseIDArray($raceIds): array
+    {
+        $results = [];
+        $query = "SELECT horse_id as horseid FROM `tbl_hist_results` WHERE `race_id`='".$raceIds."' GROUP BY horse_id";
+        $res = $this->dbConnection->query($query);
+        while ($result = $res->fetch_object()) {
+            $results[] = $result->horseid;
+        }
+
+        return $results;
+    }
+
     public function getMeetingsForIDs($meetingsIds): array
     {
         $strMeetings = implode(",", $meetingsIds);

@@ -179,10 +179,10 @@ class RaceController extends AbstractController
      */
     protected function generateTableRowsForHistoricResults(int $raceId, $ghorse, Horse $horseDetails, array $resultsCombinedArray): array
     {
-        $distanceDetails = $this->dbConnector->getDistanceArray($raceId);
+        $distanceArray = $this->dbConnector->getDistanceArray($raceId);
+        $horseIDArray = $this->dbConnector->getHorseIDArray($raceId);
         $mysqli = $this->dbConnector->getDbConnection();
-        foreach ($distanceDetails as $distance) {
-            $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."' AND `race_distance`='".$distance."'";
+            $query = "SELECT *  FROM `tbl_hist_results` WHERE `race_id`='" . $raceId . "' AND `horse_id`='".$ghorse->horse_id."'";
             $sqlnow = $mysqli->query($query);
             if ($sqlnow->num_rows > 0) {
                 while ($resnow = $sqlnow->fetch_object()) {
@@ -228,11 +228,6 @@ class RaceController extends AbstractController
                     'histId' => null
                 ];
             }
-            $this->array_sort_by_column($resultsCombinedArray, 'raceDistance');
-            $tmp = array();
-            $tmp = array_slice($resultsCombinedArray, 0, $this->selector);
-            $resultsCombinedArray = $tmp;
-        }
 
         return $resultsCombinedArray;
     }
