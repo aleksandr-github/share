@@ -225,7 +225,7 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
                         $rank = 0;
                     }
                 }
-                $arr[] = $per.'#'.$this->positionPercentage.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$rank.'#'.$result->horse_position;
+                $arr[] = $raceID.'#'.$horseID.'#'.$result->horse_name.'#'.$result->race_distance.'#'.$result->race_time.'#'.$rank.'#'.$result->horse_position;
             }
         }
 
