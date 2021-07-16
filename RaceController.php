@@ -387,6 +387,7 @@ class RaceController extends AbstractController
 
         $cnt = 1;
         $queryResult = $mysqli->query($sqlfavg);
+        $maxAVG = 0;
         if ($queryResult->num_rows > 0) {
             while ($resavg = $queryResult->fetch_object()) {
                 // This is average rating for horse in race
