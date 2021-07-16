@@ -90,15 +90,18 @@ class RaceController extends AbstractController
         if (count($ratin) > '0') {
             $ismaxrat = max($ratin);
 
-            $max_1 = $max_2 = -1;
+            $max_1 = $max_2 = $max_3 = -1;
             $maxused = 0;
 
             for ($i = 0; $i < count($ratin); $i++) {
                 if ($ratin[$i] > $max_1) {
+                    $max_3 = $max_2;
                     $max_2 = $max_1;
                     $max_1 = $ratin[$i];
                 } else if ($ratin[$i] > $max_2) {
                     $max_2 = $ratin[$i];
+                }else if ($ratin[$i] > $max_3) {
+                    $max_3 = $ratin[$i];
                 }
             }
         }
@@ -121,7 +124,7 @@ class RaceController extends AbstractController
             // IF AVERAGES IS SET!!!! (avg=1)
             } else {
                 // default view
-                $resultsCombinedArray = $this->generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $horseDetails, $resultsCombinedArray, $horseRatingData, $mainPageData);
+                $resultsCombinedArray = $this->generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, $horseDetails, $resultsCombinedArray, $horseRatingData, $mainPageData);
             }
         }
 
@@ -379,7 +382,7 @@ class RaceController extends AbstractController
      * @param array $resultsCombinedArray
      * @return array
      */
-    protected function generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, Horse $horseDetails, array $resultsCombinedArray, array $horseRatingData, array $mainPageData): array
+    protected function generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, Horse $horseDetails, array $resultsCombinedArray, array $horseRatingData, array $mainPageData): array
     {
         $AVGRANK = [];
         $mysqli = $this->dbConnector->getDbConnection();
@@ -387,7 +390,6 @@ class RaceController extends AbstractController
 
         $cnt = 1;
         $queryResult = $mysqli->query($sqlfavg);
-        $maxAVG = 0;
         if ($queryResult->num_rows > 0) {
             while ($resavg = $queryResult->fetch_object()) {
                 // This is average rating for horse in race
@@ -397,8 +399,6 @@ class RaceController extends AbstractController
                 foreach ($AVGRANK as $key => $horse) {//all array loop
                     if ($horse["horseId"] == $horseDetails->getHorseId()) {
                         $averageRankForHorseInRace = number_format($horse['AVG'], 2);
-                        if($averageRankForHorseInRace > $maxAVG)
-                            $maxAVG = $averageRankForHorseInRace;
                     }
                     else
                         $averageRankForHorseInRace = 0;
@@ -407,7 +407,7 @@ class RaceController extends AbstractController
                 //$averageRankForHorseInRace = number_format($ratingData['rank'], 2);
                 $odds = str_replace("$", "", $resavg->horse_fixed_odds);
                 $position = isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['position'] : '';
-                $isFirst = (($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_1))? true:false;
+                $isFirst = (($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_3))? true:false;
                 $resultsCombinedArray[] = [
                     'horseId' => $horseDetails->getHorseId(),
                     'horseNum' => $ghorse->horse_num,
@@ -420,9 +420,9 @@ class RaceController extends AbstractController
                     'raceHorsePosition' => null,
 		            'raceLength' => $resavg->length,
                     'raceWeight' => $resavg->horse_weight,
-                    'horseWeight' => $maxAVG,
+                    'horseWeight' => $resavg->horse_weight,
                     'rating' => $averageRatingForHorseInRace,
-                    'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
+                    'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
                     'profit' => isset($mainPageData[$horseDetails->getHorseName()]) ? ($isFirst?$mainPageData[$horseDetails->getHorseName()]['revenue']:0) : null //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
