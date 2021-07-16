@@ -404,6 +404,7 @@ class RaceController extends AbstractController
                 //$averageRankForHorseInRace = number_format($ratingData['rank'], 2);
                 $odds = str_replace("$", "", $resavg->horse_fixed_odds);
                 $position = isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['position'] : '';
+                $isFirst = (($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_1))? true:false;
                 $resultsCombinedArray[] = [
                     'horseId' => $horseDetails->getHorseId(),
                     'horseNum' => $ghorse->horse_num,
@@ -418,9 +419,9 @@ class RaceController extends AbstractController
                     'raceWeight' => $resavg->horse_weight,
                     'horseWeight' => $resavg->horse_weight,
                     'rating' => $averageRatingForHorseInRace,
-                    'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, number_format($resavg->rat, 2), $odds, $resavg->horse_position, $horseDetails->getHorseName()),
+                    'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
-                    'profit' => isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['revenue'] : null //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
+                    'profit' => isset($mainPageData[$horseDetails->getHorseName()]) ? ($isFirst?$mainPageData[$horseDetails->getHorseName()]['revenue']:0) : null //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
                 ++$cnt;
             }
