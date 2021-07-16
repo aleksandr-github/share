@@ -414,9 +414,9 @@ class RaceController extends AbstractController
                     'raceSectional' => null,
                     'raceTime' => null,
                     'raceHorsePosition' => null,
-		    'raceLength' => $resavg->length,
-                    'raceWeight' => $resavg->horse_weight,
-                    'horseWeight' => $resavg->horse_weight,
+		            'raceLength' => $resavg->rat,
+                    'raceWeight' => $odds,
+                    'horseWeight' => $position,
                     'rating' => $averageRatingForHorseInRace,
                     'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
@@ -598,7 +598,7 @@ FROM tbl_hist_results hr INNER JOIN tbl_horses h ON hr.horse_id = h.horse_id WHE
     }
 
     /* sort by col  */
-    private function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+    private function array_sort_by_column(&$arr, $col, $dir = SORT_DESC) {
         $sort_col = array();
         foreach ($arr as $key => $row) {
             $sort_col[$key] = $row[$col];
