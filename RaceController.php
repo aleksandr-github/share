@@ -396,6 +396,8 @@ class RaceController extends AbstractController
                 foreach ($AVGRANK as $key => $horse) {//all array loop
                     if ($horse["horseId"] == $horseDetails->getHorseId()) {
                         $averageRankForHorseInRace = number_format($horse['AVG'], 2);
+                        if($averageRankForHorseInRace > $maxAVG)
+                            $maxAVG = $averageRankForHorseInRace;
                     }
                     else
                         $averageRankForHorseInRace = 0;
@@ -417,7 +419,7 @@ class RaceController extends AbstractController
                     'raceHorsePosition' => null,
 		            'raceLength' => $resavg->length,
                     'raceWeight' => $resavg->horse_weight,
-                    'horseWeight' => $resavg->horse_weight,
+                    'horseWeight' => $maxAVG,
                     'rating' => $averageRatingForHorseInRace,
                     'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
