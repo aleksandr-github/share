@@ -57,6 +57,10 @@ class UpdateRankForRaceTask extends AbstractMySQLTask implements Task
      */
     private function updateRankForRace(object $race, mysqli $mysqli)
     {
+        //update rank to calc_rank in tbl_hist_results
+        $query = "UPDATE tbl_hist_results SET  cal_rank = rank";
+        $mysqli->query($query);
+
         //getting rank array from hist_table
         $horseQuery = "SELECT horse_id  FROM `tbl_hist_results` GROUP BY horse_id ORDER BY horse_id";
         $horseIDs = $mysqli->query($horseQuery);

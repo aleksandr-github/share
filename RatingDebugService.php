@@ -321,7 +321,7 @@ class RatingDebugService
                     }
 
                     //calculate rank per distance
-                    $this->array_sort_by_column($calcArray, 'distance');
+                    $this->array_sort_by_column($calcArray, 'rank');
                     $tmp = array();
                     $tmp = array_slice($calcArray, 0, $selector);
                     for ($k = 0; $k < count($tmp); $k++) {
@@ -347,7 +347,7 @@ class RatingDebugService
             return $steps;
     }
 
-    private function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+    private function array_sort_by_column(&$arr, $col, $dir = SORT_DESC) {
         $sort_col = array();
         foreach ($arr as $key => $row) {
             $sort_col[$key] = $row[$col];
