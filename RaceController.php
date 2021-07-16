@@ -408,7 +408,7 @@ class RaceController extends AbstractController
                     'horseId' => $horseDetails->getHorseId(),
                     'horseNum' => $ghorse->horse_num,
                     'horseName' => $horseDetails->getHorseName(),
-                    'horseLatestResults' => $horseDetails->getHorseLatestResults(),
+                    'horseLatestResults' => $resavg->rat,
                     'horseFxOdds' => $resavg->horse_fixed_odds,
                     'raceDistance' => null,
                     'raceSectional' => null,
