@@ -411,7 +411,8 @@ class RaceController extends AbstractController
                 $max_2 = round($max_2, 2);
                 $max_3 = round($max_3, 2);
                 if((round($averageRatingForHorseInRace, 2) == $max_1) || ($averageRatingForHorseInRace == $max_2) || ($averageRatingForHorseInRace == $max_3))
-                    $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
+                    $profit = -10;
+//                    $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
                 else
                     $profit = 0;
                 $resultsCombinedArray[] = [
