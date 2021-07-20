@@ -407,10 +407,8 @@ class RaceController extends AbstractController
                 //$averageRankForHorseInRace = number_format($ratingData['rank'], 2);
                 $odds = str_replace("$", "", $resavg->horse_fixed_odds);
                 $position = isset($mainPageData[$horseDetails->getHorseName()]) ? $mainPageData[$horseDetails->getHorseName()]['position'] : '';
-                if(($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_2) || ($averageRatingForHorseInRace == $max_3))
-                    $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
-                else
-                    $profit = 0;
+                $isFirst = (($averageRatingForHorseInRace == $max_1) || ($averageRatingForHorseInRace == $max_2) || ($averageRatingForHorseInRace == $max_3))? true:false;
+                $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
                 $resultsCombinedArray[] = [
                     'horseId' => $horseDetails->getHorseId(),
                     'horseNum' => $ghorse->horse_num,
