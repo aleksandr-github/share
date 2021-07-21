@@ -147,7 +147,7 @@ class RaceController extends AbstractController
             // IF AVERAGES IS SET!!!! (avg=1)
             } else {
                 // default view
-                $resultsCombinedArray = $this->generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, $horseDetails, $resultsCombinedArray, $horseRatingData, $mainPageData);
+                $resultsCombinedArray = $this->generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, $avgmax_1, $avgmax_2, $avgmax_3, $horseDetails, $resultsCombinedArray, $horseRatingData, $mainPageData);
             }
         }
 
@@ -405,7 +405,7 @@ class RaceController extends AbstractController
      * @param array $resultsCombinedArray
      * @return array
      */
-    protected function generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, Horse $horseDetails, array $resultsCombinedArray, array $horseRatingData, array $mainPageData): array
+    protected function generateTableRowsForHistoricResultsAVG($race, $ghorse, $max_1, $max_2, $max_3, $avgmax_1, $avgmax_2, $avgmax_3, Horse $horseDetails, array $resultsCombinedArray, array $horseRatingData, array $mainPageData): array
     {
         $AVGRANK = [];
         $mysqli = $this->dbConnector->getDbConnection();
@@ -455,7 +455,7 @@ class RaceController extends AbstractController
                     'rating' => $averageRatingForHorseInRace,
                     'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
-                    'profit' => $profit //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
+                    'profit' => $avgmax_1 //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
                 ++$cnt;
             }
