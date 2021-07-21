@@ -434,9 +434,13 @@ class RaceController extends AbstractController
                 $max_1 = round($max_1, 2);
                 $max_2 = round($max_2, 2);
                 $max_3 = round($max_3, 2);
-                if((round($averageRankForHorseInRace, 2) == $avgmax_1) || (round($averageRankForHorseInRace, 2) == $avgmax_2) || (round($averageRankForHorseInRace, 2) == $avgmax_3) || (round($averageRatingForHorseInRace, 2) == $max_1) || ($averageRatingForHorseInRace == $max_2) || ($averageRatingForHorseInRace == $max_3))
+                $profitloss = ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName());
+                if((round($averageRankForHorseInRace, 2) == $avgmax_1) || (round($averageRankForHorseInRace, 2) == $avgmax_2) || (round($averageRankForHorseInRace, 2) == $avgmax_3) || (round($averageRatingForHorseInRace, 2) == $max_1) || ($averageRatingForHorseInRace == $max_2) || ($averageRatingForHorseInRace == $max_3)){
                     $profit = -10;
+                    if($profitloss == 0)
+                        $profitloss = -10;
 //                    $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
+                }
                 else
                     $profit = 0;
                 $resultsCombinedArray[] = [
@@ -453,7 +457,7 @@ class RaceController extends AbstractController
                     'raceWeight' => $resavg->horse_weight,
                     'horseWeight' => $resavg->horse_weight,
                     'rating' => $averageRatingForHorseInRace,
-                    'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
+                    'profitLoss' => $profitloss,
                     'rank' => $averageRankForHorseInRace,
                     'profit' => $profit //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
