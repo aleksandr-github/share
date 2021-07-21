@@ -439,6 +439,8 @@ class RaceController extends AbstractController
                     $profit = -10;
                     if($profitloss == 0)
                         $profitloss = -10;
+                    if($profitloss > 0)
+                        $profit = $profitloss;
 //                    $profit = isset($mainPageData[$horseDetails->getHorseName()]) ? ($mainPageData[$horseDetails->getHorseName()]['revenue']) : null;
                 }
                 else
@@ -493,6 +495,7 @@ class RaceController extends AbstractController
         $mysqli = $this->dbConnector->getDbConnection();
         $sqlfavg = "SELECT *, AVG(`rating`) as rat, AVG(`rank`) as avgrank FROM `tbl_hist_results` WHERE `race_id`='" . $race . "' AND `horse_id`='$ghorse->horse_id' GROUP BY `horse_id`";
 
+        $resultsAVG = 0;
         $cnt = 1;
         //getting max value of avg rank
         $queryResult = $mysqli->query($sqlfavg);
