@@ -389,6 +389,34 @@ class RaceController extends AbstractController
         $sqlfavg = "SELECT *, AVG(`rating`) as rat, AVG(`rank`) as avgrank FROM `tbl_hist_results` WHERE `race_id`='" . $race . "' AND `horse_id`='$ghorse->horse_id' GROUP BY `horse_id`";
 
         $cnt = 1;
+        //getting max value of avg rank
+        $queryResult = $mysqli->query($sqlfavg);
+        if ($queryResult->num_rows > 0) {
+            while ($resavg = $queryResult->fetch_object()) {
+                $AVGRANK = $this->generateTableRowsForHistoricResultsAVGRANK($race, $ghorse, $horseDetails, $AVGRANK);
+                foreach ($AVGRANK as $key => $horse) {//all array loop
+                    if ($horse["horseId"] == $horseDetails->getHorseId()) {
+                        $averageRankArray[] = number_format($horse['AVG'], 2);
+                    }
+                    else
+                        $averageRankArray[] = 0;
+                }
+            }
+
+            $avgmax_1 = $avgmax_2 = $avgmax_3 = -1;
+
+            for ($i = 0; $i < count($averageRankArray); $i++) {
+                if ($averageRankArray[$i] > $avgmax_1) {
+                    $avgmax_3 = $avgmax_2;
+                    $avgmax_2 = $avgmax_1;
+                    $avgmax_1 = $averageRankArray[$i];
+                } else if ($averageRankArray[$i] > $avgmax_2) {
+                    $avgmax_2 = $averageRankArray[$i];
+                }else if ($averageRankArray[$i] > $avgmax_3) {
+                    $avgmax_3 = $averageRankArray[$i];
+                }
+            }
+        }
         $queryResult = $mysqli->query($sqlfavg);
         if ($queryResult->num_rows > 0) {
             while ($resavg = $queryResult->fetch_object()) {
@@ -431,7 +459,7 @@ class RaceController extends AbstractController
                     'rating' => $averageRatingForHorseInRace,
                     'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
-                    'profit' => $profit //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
+                    'profit' => $avgmax_3 //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
                 ++$cnt;
             }
