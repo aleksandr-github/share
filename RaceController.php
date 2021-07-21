@@ -110,6 +110,29 @@ class RaceController extends AbstractController
         $horseData = $this->generateHorseData($horseRatingData, false, $resultsForRaceArray);
         $mainPageData = $this->strippedMainPageRecords($race, $horseData);
 
+        // getting max avgrank
+        $getrnum1 = $mysqli->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$race'");
+        while ($ghorse1 = $getrnum1->fetch_object()) {
+            $horseDetails = $this->dbConnector->getHorseDetails($ghorse1->horse_id);
+            $rank[] = number_format($this->getResultAVG($race, $ghorse1, $horseDetails), 2);
+        }
+        if (count($rank) > '0') {
+
+            $avgmax_1 = $avgmax_2 = $avgmax_3 = -1;
+
+            for ($i = 0; $i < count($rank); $i++) {
+                if ($rank[$i] > $avgmax_1) {
+                    $avgmax_3 = $avgmax_2;
+                    $avgmax_2 = $avgmax_1;
+                    $avgmax_1 = $rank[$i];
+                } else if ($rank[$i] > $avgmax_2) {
+                    $avgmax_2 = $rank[$i];
+                }else if ($rank[$i] > $avgmax_3) {
+                    $avgmax_3 = $rank[$i];
+                }
+            }
+        }
+
         // normal calculations
         $getrnum = $mysqli->query("SELECT * FROM `tbl_temp_hraces` WHERE `race_id`='$race'");
         //$topIds = $this->generateTopIds($race);
@@ -393,33 +416,6 @@ class RaceController extends AbstractController
         $queryResult = $mysqli->query($sqlfavg);
         if ($queryResult->num_rows > 0) {
             while ($resavg = $queryResult->fetch_object()) {
-                $AVGRANK = $this->generateTableRowsForHistoricResultsAVGRANK($race, $ghorse, $horseDetails, $AVGRANK);
-                foreach ($AVGRANK as $key => $horse) {//all array loop
-                    if ($horse["horseId"] == $horseDetails->getHorseId()) {
-                        $averageRankArray[] = number_format($horse['AVG'], 2);
-                    }
-                    else
-                        $averageRankArray[] = 0;
-                }
-            }
-
-            $avgmax_1 = $avgmax_2 = $avgmax_3 = -1;
-
-            for ($i = 0; $i < count($averageRankArray); $i++) {
-                if ($averageRankArray[$i] > $avgmax_1) {
-                    $avgmax_3 = $avgmax_2;
-                    $avgmax_2 = $avgmax_1;
-                    $avgmax_1 = $averageRankArray[$i];
-                } else if ($averageRankArray[$i] > $avgmax_2) {
-                    $avgmax_2 = $averageRankArray[$i];
-                }else if ($averageRankArray[$i] > $avgmax_3) {
-                    $avgmax_3 = $averageRankArray[$i];
-                }
-            }
-        }
-        $queryResult = $mysqli->query($sqlfavg);
-        if ($queryResult->num_rows > 0) {
-            while ($resavg = $queryResult->fetch_object()) {
                 // This is average rating for horse in race
                 $ratingData = $horseRatingData[$horseDetails->getHorseId()][$race];
                 $averageRatingForHorseInRace = number_format($ratingData['rating'], 2);
@@ -459,7 +455,7 @@ class RaceController extends AbstractController
                     'rating' => $averageRatingForHorseInRace,
                     'profitLoss' => ProfitLossCalculationHelper::profitOrLossCalculation($max_1, $max_2, $max_3, number_format($resavg->rat, 2), $odds, $position, $horseDetails->getHorseName()),
                     'rank' => $averageRankForHorseInRace,
-                    'profit' => $avgmax_3 //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
+                    'profit' => $profit //in_array($horseDetails->getHorseId(), $top_ids) ? ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel, true) : ProfitLossCalculationHelper::simpleProfitCalculation($horseDataModel)
                 ];
                 ++$cnt;
             }
@@ -485,6 +481,29 @@ class RaceController extends AbstractController
         }
 
         return $resultsCombinedArray;
+    }
+
+    protected function getResultAVG($race, $ghorse, Horse $horseDetails)
+    {
+        $AVGRANK = [];
+        $mysqli = $this->dbConnector->getDbConnection();
+        $sqlfavg = "SELECT *, AVG(`rating`) as rat, AVG(`rank`) as avgrank FROM `tbl_hist_results` WHERE `race_id`='" . $race . "' AND `horse_id`='$ghorse->horse_id' GROUP BY `horse_id`";
+
+        $cnt = 1;
+        //getting max value of avg rank
+        $queryResult = $mysqli->query($sqlfavg);
+        if ($queryResult->num_rows > 0) {
+            while ($resavg = $queryResult->fetch_object()) {
+                $AVGRANK = $this->generateTableRowsForHistoricResultsAVGRANK($race, $ghorse, $horseDetails, $AVGRANK);
+                foreach ($AVGRANK as $key => $horse) {//all array loop
+                    if ($horse["horseId"] == $horseDetails->getHorseId()) {
+                        $resultsAVG = number_format($horse['AVG'], 2);
+                    } else
+                        $resultsAVG= 0;
+                }
+            }
+        }
+        return $resultsAVG;
     }
 
     private function generateTopIds(int $raceId): array
